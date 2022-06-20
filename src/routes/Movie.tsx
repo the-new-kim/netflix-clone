@@ -49,11 +49,11 @@ function Movie() {
               title: "Now Playing",
               data: dataNowPlaying,
             },
-            // {
-            //   categoryId: MovieCategories.TOP_RATED,
-            //   title: "Top Rated",
-            //   data: dataTopRated,
-            // },
+            {
+              categoryId: MovieCategories.TOP_RATED,
+              title: "Top Rated",
+              data: dataTopRated,
+            },
             // {
             //   categoryId: MovieCategories.POPULAR,
             //   title: "Popular",

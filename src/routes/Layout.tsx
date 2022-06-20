@@ -5,7 +5,7 @@ import Header from "../components/Header";
 
 const Wrapper = styled.div`
   width: 100%;
-  margin-bottom: 500px;
+  padding-bottom: 500px;
   overflow-x: hidden;
 `;
 

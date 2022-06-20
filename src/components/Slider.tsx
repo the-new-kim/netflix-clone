@@ -1,14 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { IMedia } from "../api";
-import Column from "./Column";
+import useViewportSize from "../hooks/useViewportSize";
+import Content from "./Content";
 
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+
   top: -100px;
   margin-bottom: 5vw;
 `;
@@ -18,22 +18,30 @@ const Title = styled.h1`
   padding: 10px;
 `;
 
-const Main = styled.div`
+const Main = styled.div<{ $sliderOffset: number }>`
   position: relative;
-  width: 100%;
 
-  height: fit-content;
-  background-color: red;
+  height: ${(props) =>
+    props.$sliderOffset === 6
+      ? 10.1
+      : props.$sliderOffset === 4
+      ? 15.3
+      : props.$sliderOffset === 3
+      ? 20.5
+      : 31}vw;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
-const Contents = styled(motion.div)`
+const Contents = styled(motion.div)<{ $sliderOffset: number }>`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: ${(props) => `repeat(${props.$sliderOffset}, 1fr)`};
 `;
 
 const NextArrow = styled(motion.div)`
@@ -61,29 +69,41 @@ interface ISliderProps {
 }
 
 const contentsVariants = {
-  initial: { x: window.innerWidth + 10 },
+  initial: (viewportWidth: number) => ({ x: viewportWidth + 10 }),
   animate: { x: 0 },
-  exit: { x: -window.innerWidth - 10 },
+  exit: (viewportWidth: number) => ({ x: -viewportWidth - 10 }),
 };
 
 function Slider({ data, title, categoryId }: ISliderProps) {
+  const { viewportWidth } = useViewportSize();
+
   const [sliderOffset, setSliderOffset] = useState(6);
   const [sliderIndex, setSliderIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
 
-  const increasesliderIndex = () => {
+  const increaseSliderIndex = () => {
     if (data) {
       if (isSliding) return;
       setIsSliding(true);
-      const maxIndex = Math.floor(data?.length / sliderOffset) - 1;
+      const maxIndex = Math.floor(data.length / sliderOffset) - 1;
       setSliderIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
 
+  useLayoutEffect(() => {
+    viewportWidth > 1000
+      ? setSliderOffset(6)
+      : viewportWidth > 800
+      ? setSliderOffset(4)
+      : viewportWidth > 500
+      ? setSliderOffset(3)
+      : setSliderOffset(2);
+  }, [viewportWidth]);
+
   return (
     <Wrapper>
       <Title>{title}</Title>
-      <Main>
+      <Main $sliderOffset={sliderOffset}>
         <AnimatePresence
           initial={false}
           onExitComplete={() => setIsSliding(false)}
@@ -95,25 +115,30 @@ function Slider({ data, title, categoryId }: ISliderProps) {
             exit="exit"
             key={sliderIndex}
             transition={{ type: "tween", duration: 1 }}
+            custom={viewportWidth}
+            $sliderOffset={sliderOffset}
           >
             {data
               .slice(
                 sliderOffset * sliderIndex,
                 sliderOffset * sliderIndex + sliderOffset
               )
-              .map((item) => (
-                <Column
+              .map((item, index) => (
+                <Content
                   isLoading={!!data}
                   data={item}
-                  id={`${categoryId}${item.id + ""}`}
+                  category={categoryId}
+                  id={item.id + ""}
                   key={item.id}
+                  isFirstChild={index === 0}
+                  isLastChild={index === sliderOffset - 1}
                 />
               ))}
           </Contents>
         </AnimatePresence>
         <NextArrow>
           <svg
-            onClick={increasesliderIndex}
+            onClick={increaseSliderIndex}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 320 512"
           >

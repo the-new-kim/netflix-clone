@@ -4,6 +4,7 @@ import { IGetMediaResult, IMedia } from "../api";
 import { MovieCategories } from "../routes/Movie";
 import { TvCategories } from "../routes/Tv";
 import { makeImagePath } from "../utils";
+import Detail from "./Detail";
 import Slider from "./Slider";
 
 const Banner = styled.div<{ $bgImg: string }>`
@@ -65,6 +66,7 @@ function MainScreen({ categories }: IMainScreenProps) {
           categoryId={category.categoryId}
         />
       ))}
+      <Detail />
     </>
   );
 }

@@ -13,7 +13,9 @@ function Router() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="movie" element={<Movie />} />
+          <Route path="movie" element={<Movie />}>
+            <Route path=":category/:id" element={<Movie />} />
+          </Route>
           <Route path="tv" element={<Tv />} />
           <Route path="search" element={<Search />} />
         </Route>
