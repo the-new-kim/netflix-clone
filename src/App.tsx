@@ -1,25 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { createGlobalStyle, ThemeProvider } from "styled-components";
+import reset from "styled-reset";
+import Router from "./Router";
+import { Helmet } from "react-helmet";
+import { defaultTheme } from "./theme";
+
+const GlobalStyle = createGlobalStyle`
+  ${reset}
+  * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 100;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.color}
+}
+a{
+    color: inherit;
+    text-decoration:none;
+  }
+
+`;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={defaultTheme}>
+      {/* <Helmet>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;200;400&display=swap"
+          rel="stylesheet"
+        />
+      </Helmet> */}
+      <GlobalStyle />
+      <Router />
+    </ThemeProvider>
   );
 }
 
