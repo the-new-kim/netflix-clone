@@ -42,6 +42,8 @@ const Contents = styled(motion.div)<{ $sliderOffset: number }>`
   display: grid;
   gap: 10px;
   grid-template-columns: ${(props) => `repeat(${props.$sliderOffset}, 1fr)`};
+
+  transform-style: preserve-3d;
 `;
 
 const NextArrow = styled(motion.div)`

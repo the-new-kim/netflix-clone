@@ -54,11 +54,11 @@ function Movie() {
               title: "Top Rated",
               data: dataTopRated,
             },
-            // {
-            //   categoryId: MovieCategories.POPULAR,
-            //   title: "Popular",
-            //   data: dataPopular,
-            // },
+            {
+              categoryId: MovieCategories.POPULAR,
+              title: "Popular",
+              data: dataPopular,
+            },
           ]}
         />
       )}

@@ -3,7 +3,7 @@ const BASE_URL = "https://api.themoviedb.org/3/";
 
 export enum MediaType {
   MOVIE = "movie",
-  tv = "tv",
+  TV = "tv",
   PERSON = "person",
 }
 
@@ -34,5 +34,11 @@ export function getMovies(category: string) {
 export function getTvShows(category: string) {
   return fetch(
     `${BASE_URL}tv/${category}?api_key=${API_KEY}&language=en-US&page=1`
+  ).then((response) => response.json());
+}
+
+export function getMediaDetails(id: string | number, type: string) {
+  return fetch(
+    `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
   ).then((response) => response.json());
 }

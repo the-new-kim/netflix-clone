@@ -7,5 +7,6 @@ declare module "styled-components" {
     bgColor: string;
     color: string;
     logoRed: string;
+    bgDarkGray: string;
   }
 }

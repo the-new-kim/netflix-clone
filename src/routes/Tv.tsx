@@ -49,16 +49,16 @@ function Tv() {
               title: "On The Air",
               data: dataOnTheAir,
             },
-            // {
-            //   categoryId: TvCategories.TOP_RATED,
-            //   title: "Top Rated",
-            //   data: dataTopRated,
-            // },
-            // {
-            //   categoryId: TvCategories.POPULAR,
-            //   title: "Popular",
-            //   data: dataPopular,
-            // },
+            {
+              categoryId: TvCategories.TOP_RATED,
+              title: "Top Rated",
+              data: dataTopRated,
+            },
+            {
+              categoryId: TvCategories.POPULAR,
+              title: "Popular",
+              data: dataPopular,
+            },
           ]}
         />
       )}
