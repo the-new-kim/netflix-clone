@@ -37,7 +37,28 @@ export function getTvShows(category: string) {
   ).then((response) => response.json());
 }
 
-export function getMediaDetails(id: string | number, type: string) {
+interface IGenres {
+  id: number;
+  name: string;
+}
+
+export interface IGetMediaDetals {
+  backdrop_path: string;
+  poster_path: string;
+  genres: IGenres[];
+  id: number;
+  title?: string;
+  name?: string;
+  overview: string;
+  runtime: number;
+}
+
+export enum MatchTypes {
+  MOVIE = "movie",
+  TV = "tv",
+}
+
+export function getMediaDetails(id: string | number, type: MatchTypes) {
   return fetch(
     `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
   ).then((response) => response.json());

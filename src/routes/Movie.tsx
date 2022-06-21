@@ -9,35 +9,20 @@ export enum MovieCategories {
 }
 
 function Movie() {
-  const { isLoading: loadingNowPlaying, data: dataNowPlaying } =
-    useQuery<IGetMediaResult>(
-      [MovieCategories.NOW_PLAYING, "movie"],
-      () => getMovies(MovieCategories.NOW_PLAYING),
-      {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+  const { data: dataNowPlaying } = useQuery<IGetMediaResult>(
+    [MovieCategories.NOW_PLAYING, "movie"],
+    () => getMovies(MovieCategories.NOW_PLAYING)
+  );
 
-  const { isLoading: loadingTopRated, data: dataTopRated } =
-    useQuery<IGetMediaResult>(
-      [MovieCategories.TOP_RATED, "movie"],
-      () => getMovies(MovieCategories.TOP_RATED),
-      {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+  const { data: dataTopRated } = useQuery<IGetMediaResult>(
+    [MovieCategories.TOP_RATED, "movie"],
+    () => getMovies(MovieCategories.TOP_RATED)
+  );
 
-  const { isLoading: loadingPopular, data: dataPopular } =
-    useQuery<IGetMediaResult>(
-      [MovieCategories.POPULAR, "movie"],
-      () => getMovies(MovieCategories.POPULAR),
-      {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-      }
-    );
+  const { data: dataPopular } = useQuery<IGetMediaResult>(
+    [MovieCategories.POPULAR, "movie"],
+    () => getMovies(MovieCategories.POPULAR)
+  );
 
   return (
     <>
