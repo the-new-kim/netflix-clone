@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMatch } from "react-router-dom";
 import styled from "styled-components";
 import { IGetMediaResult, MatchTypes } from "../api";
 import { MovieCategories } from "../routes/Movie";
@@ -44,8 +43,6 @@ interface IMainScreenProps {
 
 function MainScreen({ categories }: IMainScreenProps) {
   const [randomIndex, setRandomIndex] = useState(0);
-  const movieMatched = useMatch("/movie/:category/:mediaId");
-  const tvMatched = useMatch("/tv/:category/:mediaId");
 
   return (
     <>
@@ -70,12 +67,12 @@ function MainScreen({ categories }: IMainScreenProps) {
         />
       ))}
 
-      <Detail
-        matchedType={
-          movieMatched ? MatchTypes.MOVIE : tvMatched ? MatchTypes.TV : null
-        }
-        matchedParams={movieMatched ? movieMatched.params : null}
-      />
+      {/* <Detail
+      // matchedType={
+      //   movieMatched ? MatchTypes.MOVIE : tvMatched ? MatchTypes.TV : null
+      // }
+      // matchedParams={movieMatched ? movieMatched.params : null}
+      /> */}
     </>
   );
 }

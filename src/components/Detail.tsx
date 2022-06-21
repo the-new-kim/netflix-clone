@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "react-query";
-import { Params, useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getMediaDetails, IGetMediaDetals, MatchTypes } from "../api";
+import { getMovieDetails, getTvDetails, MatchTypes } from "../api";
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -15,14 +16,16 @@ const Overlay = styled(motion.div)`
 `;
 
 const Wrapper = styled(motion.div)`
-  position: absolute;
+  position: fixed;
+  height: 100px;
+  /* position: absolute; */
   top: 0;
   left: 0;
   right: 0;
   margin: auto;
   width: 50vw;
   max-width: 500px;
-  height: auto;
+  /* height: auto; */
   background-color: ${(props) => props.theme.bgDarkGray};
   z-index: 101;
 `;
@@ -35,54 +38,54 @@ const Wrapper = styled(motion.div)`
 //   aspect-ratio: 1.6/1;
 // `;
 
-interface IDetailProps {
-  matchedType: MatchTypes | null;
-  matchedParams: Params<"category" | "mediaId"> | null;
-}
-
-function Detail({ matchedType, matchedParams }: IDetailProps) {
+function Detail() {
   const navigate = useNavigate();
+  const movieMatched = useMatch("/movie/:category/:mediaId");
+  const tvMatched = useMatch("/tv/:category/:mediaId");
+  const [matchedType, setMatchedType] = useState<MatchTypes | null>(null);
 
-  console.log(!!matchedType, !!matchedParams);
+  useEffect(() => {
+    setMatchedType(
+      movieMatched ? MatchTypes.MOVIE : tvMatched ? MatchTypes.TV : null
+    );
+  }, [movieMatched, tvMatched]);
 
-  const { data } = useQuery<IGetMediaDetals>(
-    ["detail", matchedType, matchedParams?.mediaId],
-    () => getMediaDetails(matchedParams?.mediaId!, matchedType!),
+  const { data } = useQuery(
+    ["detail", "movie", movieMatched?.params.mediaId],
+    () => getMovieDetails(movieMatched?.params.mediaId || ""),
     {
-      keepPreviousData: true,
-      enabled: !!matchedType || !!matchedParams,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
+      enabled: !!movieMatched,
     }
   );
 
-  console.log(data);
-
-  const notMatched =
-    !matchedType ||
-    !matchedParams ||
-    !matchedParams.category ||
-    !matchedParams.mediaId;
+  const isLoading = !movieMatched || !tvMatched || !data;
 
   return (
     <>
       <AnimatePresence>
-        {notMatched ? null : (
-          <>
-            <Wrapper
-              layoutId={`${matchedParams.category + matchedParams.mediaId}`}
-            >
-              hi
-            </Wrapper>
-            <Overlay
-              onClick={() => {
-                navigate(`/${matchedType}`);
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-          </>
+        {isLoading ? null : (
+          <Wrapper
+            onClick={() => {
+              navigate(`/${matchedType}`);
+            }}
+            layoutId={`${
+              movieMatched
+                ? movieMatched.params.category! + movieMatched.params.mediaId!
+                : tvMatched
+                ? tvMatched.params.category! + tvMatched.params.mediaId!
+                : ""
+            }`}
+          >
+            hi
+          </Wrapper>
+          // <Overlay
+          //   onClick={() => {
+          //     navigate(`/${matchedType}`);
+          //   }}
+          //   initial={{ opacity: 0 }}
+          //   animate={{ opacity: 1 }}
+          //   exit={{ opacity: 0 }}
+          // />
         )}
       </AnimatePresence>
     </>

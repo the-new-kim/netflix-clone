@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { wrap } from "popmotion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { IMedia } from "../api";
@@ -70,27 +71,69 @@ interface ISliderProps {
   categoryId: string;
 }
 
+interface IContentsVariants {
+  viewportWidth: number;
+  direction: number;
+}
+
+// const contentsVariants = {
+//   initial: ({ viewportWidth, isBackward }: IContentsVariants) => ({
+//     x: viewportWidth + 10,
+//   }),
+//   animate: { x: 0 },
+//   exit: ({ viewportWidth, isBackward }: IContentsVariants) => ({
+//     x: -viewportWidth - 10,
+//   }),
+// };
 const contentsVariants = {
-  initial: (viewportWidth: number) => ({ x: viewportWidth + 10 }),
+  initial: ({ viewportWidth, direction }: IContentsVariants) => ({
+    x: direction < 0 ? -viewportWidth - 10 : viewportWidth + 10,
+  }),
   animate: { x: 0 },
-  exit: (viewportWidth: number) => ({ x: -viewportWidth - 10 }),
+  exit: ({ viewportWidth, direction }: IContentsVariants) => ({
+    x: direction < 0 ? viewportWidth + 10 : -viewportWidth - 10,
+  }),
 };
 
 function Slider({ data, title, categoryId }: ISliderProps) {
   const { viewportWidth } = useViewportSize();
 
   const [sliderOffset, setSliderOffset] = useState(6);
-  const [sliderIndex, setSliderIndex] = useState(0);
+  // const [sliderIndex, setSliderIndex] = useState(0);
+  // const [keyIndex, setKeyIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
+  // const [isBackward, setIsBackward] = useState(false);
 
-  const increaseSliderIndex = () => {
-    if (data) {
-      if (isSliding) return;
-      setIsSliding(true);
-      const maxIndex = Math.floor(data.length / sliderOffset) - 1;
-      setSliderIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
+  // const increaseSliderIndex = () => {
+  //   if (data) {
+  //     if (isSliding) return;
+  //     setIsBackward(false);
+  //     setIsSliding(true);
+  //     const maxIndex = Math.floor(data.length / sliderOffset) - 1;
+  //     setSliderIndex((prev) => (prev + 1 > maxIndex ? 0 : prev + 1));
+  //     setKeyIndex((prev) => prev + 1);
+  //   }
+  // };
+
+  // const decreaseSliderIndex = () => {
+  //   if (data) {
+  //     if (isSliding) return;
+  //     setIsBackward(true);
+  //     setIsSliding(true);
+  //     const maxIndex = Math.floor(data.length / sliderOffset) - 1;
+  //     setSliderIndex((prev) => (prev - 1 < 0 ? maxIndex : prev - 1));
+  //     setKeyIndex((prev) => prev - 1);
+  //   }
+  // };
+
+  const [[page, direction], setPage] = useState([0, 0]);
+  const imageIndex = wrap(0, Math.floor(data.length / sliderOffset) - 1, page);
+
+  const paginate = (newDirection: number) => {
+    setPage([page + newDirection, newDirection]);
   };
+
+  console.log(page, direction);
 
   useLayoutEffect(() => {
     viewportWidth > 1000
@@ -104,10 +147,11 @@ function Slider({ data, title, categoryId }: ISliderProps) {
 
   return (
     <Wrapper>
-      <Title>{title}</Title>
+      <Title onClick={() => paginate(-1)}>{title}</Title>
       <Main $sliderOffset={sliderOffset}>
         <AnimatePresence
           initial={false}
+          custom={{ viewportWidth, direction }}
           onExitComplete={() => setIsSliding(false)}
         >
           <Contents
@@ -115,15 +159,15 @@ function Slider({ data, title, categoryId }: ISliderProps) {
             initial="initial"
             animate="animate"
             exit="exit"
-            key={sliderIndex}
+            key={page}
             transition={{ type: "tween", duration: 1 }}
-            custom={viewportWidth}
+            custom={{ viewportWidth, direction }}
             $sliderOffset={sliderOffset}
           >
             {data
               .slice(
-                sliderOffset * sliderIndex,
-                sliderOffset * sliderIndex + sliderOffset
+                sliderOffset * imageIndex,
+                sliderOffset * imageIndex + sliderOffset
               )
               .map((item, index) => (
                 <Content
@@ -140,7 +184,7 @@ function Slider({ data, title, categoryId }: ISliderProps) {
         </AnimatePresence>
         <NextArrow>
           <svg
-            onClick={increaseSliderIndex}
+            onClick={() => paginate(1)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 320 512"
           >

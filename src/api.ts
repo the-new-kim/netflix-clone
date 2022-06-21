@@ -1,4 +1,4 @@
-const API_KEY = "cf13f93b5d8390312d36ffb98bb38259";
+const API_KEY = "d6e929621d2bfdd3c585aedf3aa51b87";
 const BASE_URL = "https://api.themoviedb.org/3/";
 
 export enum MediaType {
@@ -58,8 +58,14 @@ export enum MatchTypes {
   TV = "tv",
 }
 
-export function getMediaDetails(id: string | number, type: MatchTypes) {
-  return fetch(
-    `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
-  ).then((response) => response.json());
+export function getMovieDetails(id: string | number) {
+  return fetch(`${BASE_URL}movie/${id}?api_key=${API_KEY}&language=en-US`).then(
+    (response) => response.json()
+  );
+}
+
+export function getTvDetails(id: string | number) {
+  return fetch(`${BASE_URL}tv/${id}?api_key=${API_KEY}&language=en-US`).then(
+    (response) => response.json()
+  );
 }
