@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { wrap } from "popmotion";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { IMedia } from "../api";
 import useViewportSize from "../hooks/useViewportSize";
@@ -52,7 +52,7 @@ const ContentWrapper = styled(motion.div)`
   width: 100%;
   height: 100%;
 `;
-const NextArrow = styled(motion.div)<{ $mouseEnter: boolean }>`
+const NextArrow = styled(motion.div)<{ $arrowShowing: boolean }>`
   position: absolute;
   top: 0;
   right: 0;
@@ -64,7 +64,7 @@ const NextArrow = styled(motion.div)<{ $mouseEnter: boolean }>`
   align-items: center;
   z-index: 99;
   transition: opacity ease-out 300ms;
-  opacity: ${(props) => (props.$mouseEnter ? 1 : 0)};
+  opacity: ${(props) => (props.$arrowShowing ? 1 : 0)};
 
   cursor: pointer;
 
@@ -130,7 +130,7 @@ interface ISliderProps {
 }
 
 function Slider({ data, title, categoryId }: ISliderProps) {
-  const [mouseEnter, setMouseEnter] = useState(false);
+  const [arrowShowing, setArrowShowing] = useState(false);
 
   const { viewportWidth } = useViewportSize();
 
@@ -167,8 +167,8 @@ function Slider({ data, title, categoryId }: ISliderProps) {
       <Title>{title}</Title>
       <Main
         $sliderOffset={sliderOffset}
-        onMouseEnter={() => setMouseEnter(true)}
-        onMouseLeave={() => setMouseEnter(false)}
+        onMouseEnter={() => setArrowShowing(true)}
+        onMouseLeave={() => setArrowShowing(false)}
       >
         <Row $sliderOffset={sliderOffset} ref={rowRef}>
           {Array.from(Array(sliderOffset)).map((_, index) => (
@@ -208,7 +208,7 @@ function Slider({ data, title, categoryId }: ISliderProps) {
           ))}
         </Row>
         <PrevArrow
-          $mouseEnter={mouseEnter}
+          $arrowShowing={arrowShowing}
           onClick={() => paginate(-sliderOffset)}
         >
           <div>
@@ -219,7 +219,7 @@ function Slider({ data, title, categoryId }: ISliderProps) {
         </PrevArrow>
 
         <NextArrow
-          $mouseEnter={mouseEnter}
+          $arrowShowing={arrowShowing}
           onClick={() => paginate(sliderOffset)}
         >
           <div>
