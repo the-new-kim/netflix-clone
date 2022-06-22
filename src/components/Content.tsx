@@ -5,11 +5,15 @@ import styled from "styled-components";
 import { IMedia } from "../api";
 import { makeImagePath } from "../utils";
 
-const Wrapper = styled(motion.div)`
+const Wrapper = styled(motion.div)``;
+
+const LayoutWrapper = styled(motion.div)`
   position: relative;
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  /* display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto;
+  grid-template-rows: auto; */
   /* background-color: red; */
   cursor: pointer;
 `;
@@ -37,12 +41,25 @@ const Title = styled(motion.h3)`
   padding: 5px;
 `;
 
-const BigWrapper = styled(motion.div)``;
-
 interface IContentVariants {
   isFirstChild: boolean;
   isLastChild: boolean;
 }
+
+const contentVariants = {
+  initial: ({ isFirstChild, isLastChild }: IContentVariants) => ({
+    originX: isFirstChild ? 0 : isLastChild ? 1 : 0.5,
+    originY: 1,
+    scale: 1,
+    boxShadow: "0px 0px 0px 0px rgba(0,0,0,0)",
+  }),
+  hover: () => ({
+    scale: 1.8,
+    // y: -30,
+    boxShadow: "0px 0px 50px 0px rgba(0,0,0,0.8)",
+    transition: { delay: 0.5, type: "tween" },
+  }),
+};
 
 interface IContentProps {
   isLoading: boolean;
@@ -68,7 +85,8 @@ function Content({
   };
 
   return (
-    <motion.div
+    <Wrapper
+      layoutId={`${category + id}`}
       onClick={navigateToDetail}
       onMouseEnter={() => {
         setIsMouseEnter(true);
@@ -78,21 +96,14 @@ function Content({
       }}
     >
       <LayoutGroup>
-        <Wrapper
+        <LayoutWrapper
           layout
-          layoutId={`${category}${id}`}
-          animate={{
-            originX: isFirstChild ? 0 : isLastChild ? 1 : 0.5,
-            originY: 1,
-            boxShadow: "0px 0px 0px 0px rgba(0,0,0,0)",
-          }}
-          whileHover={{
-            scale: 1.8,
-            y: -30,
-            boxShadow: "0px 0px 50px 0px rgba(0,0,0,0.8)",
-            transition: { delay: 0.5, type: "tween" },
-          }}
+          variants={contentVariants}
+          initial="initial"
+          animate="initial"
+          whileHover="hover"
           transition={{ type: "tween" }}
+          custom={{ isFirstChild, isLastChild }}
         >
           {data.backdrop_path ? (
             <Cover layout $bgImg={makeImagePath(data.backdrop_path, "w500")} />
@@ -111,9 +122,9 @@ function Content({
               </Title>
             )}
           </AnimatePresence>
-        </Wrapper>
+        </LayoutWrapper>
       </LayoutGroup>
-    </motion.div>
+    </Wrapper>
   );
 }
 

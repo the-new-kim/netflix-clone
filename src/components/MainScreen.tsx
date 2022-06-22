@@ -67,12 +67,7 @@ function MainScreen({ categories }: IMainScreenProps) {
         />
       ))}
 
-      {/* <Detail
-      // matchedType={
-      //   movieMatched ? MatchTypes.MOVIE : tvMatched ? MatchTypes.TV : null
-      // }
-      // matchedParams={movieMatched ? movieMatched.params : null}
-      /> */}
+      <Detail />
     </>
   );
 }

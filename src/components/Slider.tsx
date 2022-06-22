@@ -31,7 +31,7 @@ const Main = styled.div<{ $sliderOffset: number }>`
   justify-content: flex-start;
   align-items: center;
 `;
-const Row = styled(motion.div)<{ $sliderOffset: number }>`
+const Row = styled.div<{ $sliderOffset: number }>`
   position: relative;
   width: 100%;
   height: 100%;
