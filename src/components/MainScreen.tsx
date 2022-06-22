@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { IGetMediaResult, MatchTypes } from "../api";
+import { IGetMediaResult } from "../api";
 import { MovieCategories } from "../routes/Movie";
 import { TvCategories } from "../routes/Tv";
 import { makeImagePath } from "../utils";

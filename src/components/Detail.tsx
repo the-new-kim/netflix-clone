@@ -17,7 +17,7 @@ const Overlay = styled(motion.div)`
 `;
 
 const Wrapper = styled(motion.div)`
-  position: absolute;
+  position: fixed;
 
   /* position: absolute; */
   top: 0;
@@ -95,6 +95,7 @@ function Detail() {
               layoutId={`${
                 movieMatched.params.category! + movieMatched.params.mediaId
               }`}
+              initial={false}
             >
               <Cover>cover</Cover>
               <Title>title</Title>

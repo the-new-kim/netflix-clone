@@ -11,10 +11,6 @@ const LayoutWrapper = styled(motion.div)`
   position: relative;
   display: flex;
   flex-direction: column;
-  /* display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto; */
-  /* background-color: red; */
   cursor: pointer;
 `;
 
@@ -47,11 +43,12 @@ interface IContentVariants {
 }
 
 const contentVariants = {
-  initial: ({ isFirstChild, isLastChild }: IContentVariants) => ({
+  animate: ({ isFirstChild, isLastChild }: IContentVariants) => ({
     originX: isFirstChild ? 0 : isLastChild ? 1 : 0.5,
     originY: 1,
     scale: 1,
     boxShadow: "0px 0px 0px 0px rgba(0,0,0,0)",
+    transition: { type: "tween" },
   }),
   hover: () => ({
     scale: 1.8,
@@ -59,6 +56,12 @@ const contentVariants = {
     boxShadow: "0px 0px 50px 0px rgba(0,0,0,0.8)",
     transition: { delay: 0.5, type: "tween" },
   }),
+};
+
+const titleVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { delay: 0.5 } },
+  exit: { opacity: 0 },
 };
 
 interface IContentProps {
@@ -78,9 +81,10 @@ function Content({
   isLastChild,
 }: IContentProps) {
   const navigate = useNavigate();
-  const [isMouseEnter, setIsMouseEnter] = useState(false);
+  const [showTitle, setShowTitle] = useState(false);
 
   const navigateToDetail = () => {
+    setShowTitle(false);
     navigate(`${category}/${id}`);
   };
 
@@ -89,20 +93,19 @@ function Content({
       layoutId={`${category + id}`}
       onClick={navigateToDetail}
       onMouseEnter={() => {
-        setIsMouseEnter(true);
+        setShowTitle(true);
       }}
       onMouseLeave={() => {
-        setIsMouseEnter(false);
+        setShowTitle(false);
       }}
     >
       <LayoutGroup>
         <LayoutWrapper
           layout
           variants={contentVariants}
-          initial="initial"
-          animate="initial"
+          initial={false}
+          animate="animate"
           whileHover="hover"
-          transition={{ type: "tween" }}
           custom={{ isFirstChild, isLastChild }}
         >
           {data.backdrop_path ? (
@@ -111,12 +114,13 @@ function Content({
             <NoCover layout>{data.title || data.name}</NoCover>
           )}
           <AnimatePresence>
-            {isMouseEnter && (
+            {showTitle && (
               <Title
                 key="contentTitle"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { delay: 0.5 } }}
-                exit={{ opacity: 0 }}
+                variants={titleVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
               >
                 {data.title || data.name}
               </Title>
