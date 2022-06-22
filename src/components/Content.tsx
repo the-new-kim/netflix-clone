@@ -76,11 +76,6 @@ function Content({
       onMouseLeave={() => {
         setIsMouseEnter(false);
       }}
-      animate={{ z: 0 }}
-      whileHover={{
-        z: 100,
-      }}
-      transition={{ delay: 0.5 }}
     >
       <LayoutGroup>
         <Wrapper

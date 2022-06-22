@@ -9,7 +9,6 @@ import Content from "./Content";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
-
   top: -100px;
   margin-bottom: 5vw;
 `;
@@ -18,10 +17,8 @@ const Title = styled.h1`
   font-weight: bold;
   padding: 10px;
 `;
-
 const Main = styled.div<{ $sliderOffset: number }>`
   position: relative;
-
   height: ${(props) =>
     props.$sliderOffset === 6
       ? 10.1
@@ -34,36 +31,97 @@ const Main = styled.div<{ $sliderOffset: number }>`
   justify-content: flex-start;
   align-items: center;
 `;
-
-const Contents = styled(motion.div)<{ $sliderOffset: number }>`
+const Row = styled(motion.div)<{ $sliderOffset: number }>`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: ${(props) => `repeat(${props.$sliderOffset}, 1fr)`};
+  transform-style: preserve-3d;
+`;
+const Column = styled(motion.div)`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+const ContentWrapper = styled(motion.div)`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  display: grid;
-  gap: 10px;
-  grid-template-columns: ${(props) => `repeat(${props.$sliderOffset}, 1fr)`};
-
-  transform-style: preserve-3d;
+  height: 100%;
 `;
-
-const NextArrow = styled(motion.div)`
+const NextArrow = styled(motion.div)<{ $mouseEnter: boolean }>`
   position: absolute;
   top: 0;
   right: 0;
-  width: 8vw;
+  width: 7vw;
+  max-width: 100px;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 99;
-  svg {
-    width: 40px;
-    height: 40px;
-    fill: white;
-    cursor: pointer;
+  transition: opacity ease-out 300ms;
+  opacity: ${(props) => (props.$mouseEnter ? 1 : 0)};
+
+  cursor: pointer;
+
+  /* ::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    content: "";
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 100%
+    );
+  } */
+
+  > div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 100ms ease-out;
+    z-index: 100;
+    > svg {
+      width: 25%;
+      fill: white;
+    }
+  }
+  :hover {
+    > div {
+      transform: scale(1.5);
+    }
   }
 `;
+const PrevArrow = styled(NextArrow)`
+  left: 0;
+  transform: rotate(180deg);
+`;
+
+interface IContentWrapperVariants {
+  direction: number;
+  rowWidth: number;
+}
+
+const contentWrapperVariants = {
+  enter: ({ direction, rowWidth }: IContentWrapperVariants) => ({
+    x: direction > 0 ? rowWidth + 10 : -rowWidth - 10,
+  }),
+  center: {
+    x: 0,
+  },
+  exit: ({ direction, rowWidth }: IContentWrapperVariants) => ({
+    x: direction > 0 ? -rowWidth - 10 : rowWidth + 10,
+  }),
+};
 
 interface ISliderProps {
   data: IMedia[];
@@ -71,69 +129,28 @@ interface ISliderProps {
   categoryId: string;
 }
 
-interface IContentsVariants {
-  viewportWidth: number;
-  direction: number;
-}
-
-// const contentsVariants = {
-//   initial: ({ viewportWidth, isBackward }: IContentsVariants) => ({
-//     x: viewportWidth + 10,
-//   }),
-//   animate: { x: 0 },
-//   exit: ({ viewportWidth, isBackward }: IContentsVariants) => ({
-//     x: -viewportWidth - 10,
-//   }),
-// };
-const contentsVariants = {
-  initial: ({ viewportWidth, direction }: IContentsVariants) => ({
-    x: direction < 0 ? -viewportWidth - 10 : viewportWidth + 10,
-  }),
-  animate: { x: 0 },
-  exit: ({ viewportWidth, direction }: IContentsVariants) => ({
-    x: direction < 0 ? viewportWidth + 10 : -viewportWidth - 10,
-  }),
-};
-
 function Slider({ data, title, categoryId }: ISliderProps) {
+  const [mouseEnter, setMouseEnter] = useState(false);
+
   const { viewportWidth } = useViewportSize();
 
   const [sliderOffset, setSliderOffset] = useState(6);
-  // const [sliderIndex, setSliderIndex] = useState(0);
-  // const [keyIndex, setKeyIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
-  // const [isBackward, setIsBackward] = useState(false);
-
-  // const increaseSliderIndex = () => {
-  //   if (data) {
-  //     if (isSliding) return;
-  //     setIsBackward(false);
-  //     setIsSliding(true);
-  //     const maxIndex = Math.floor(data.length / sliderOffset) - 1;
-  //     setSliderIndex((prev) => (prev + 1 > maxIndex ? 0 : prev + 1));
-  //     setKeyIndex((prev) => prev + 1);
-  //   }
-  // };
-
-  // const decreaseSliderIndex = () => {
-  //   if (data) {
-  //     if (isSliding) return;
-  //     setIsBackward(true);
-  //     setIsSliding(true);
-  //     const maxIndex = Math.floor(data.length / sliderOffset) - 1;
-  //     setSliderIndex((prev) => (prev - 1 < 0 ? maxIndex : prev - 1));
-  //     setKeyIndex((prev) => prev - 1);
-  //   }
-  // };
-
+  const [rowWidth, setRowWidth] = useState(0);
   const [[page, direction], setPage] = useState([0, 0]);
-  const imageIndex = wrap(0, Math.floor(data.length / sliderOffset) - 1, page);
+  const dataIndex = wrap(0, data.length - (data.length % sliderOffset), page);
 
   const paginate = (newDirection: number) => {
+    if (isSliding) return;
+    setIsSliding(true);
     setPage([page + newDirection, newDirection]);
   };
 
-  console.log(page, direction);
+  const rowRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    rowRef.current && setRowWidth(rowRef.current.clientWidth);
+  }, [rowRef, viewportWidth]);
 
   useLayoutEffect(() => {
     viewportWidth > 1000
@@ -147,49 +164,69 @@ function Slider({ data, title, categoryId }: ISliderProps) {
 
   return (
     <Wrapper>
-      <Title onClick={() => paginate(-1)}>{title}</Title>
-      <Main $sliderOffset={sliderOffset}>
-        <AnimatePresence
-          initial={false}
-          custom={{ viewportWidth, direction }}
-          onExitComplete={() => setIsSliding(false)}
+      <Title>{title}</Title>
+      <Main
+        $sliderOffset={sliderOffset}
+        onMouseEnter={() => setMouseEnter(true)}
+        onMouseLeave={() => setMouseEnter(false)}
+      >
+        <Row $sliderOffset={sliderOffset} ref={rowRef}>
+          {Array.from(Array(sliderOffset)).map((_, index) => (
+            <Column
+              key={index}
+              animate={{ z: 0 }}
+              whileHover={{
+                z: 100,
+              }}
+              transition={{ delay: 0.5 }}
+            >
+              <AnimatePresence
+                initial={false}
+                custom={{ direction, rowWidth }}
+                onExitComplete={() => setIsSliding(false)}
+              >
+                <ContentWrapper
+                  key={page + index}
+                  variants={contentWrapperVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  custom={{ direction, rowWidth }}
+                  transition={{ x: { type: "tween", duration: 1 } }}
+                >
+                  <Content
+                    isLoading={!!data}
+                    data={data[dataIndex + index]}
+                    category={categoryId}
+                    id={data[dataIndex + index].id + ""}
+                    isFirstChild={index === 0}
+                    isLastChild={index === sliderOffset - 1}
+                  />
+                </ContentWrapper>
+              </AnimatePresence>
+            </Column>
+          ))}
+        </Row>
+        <PrevArrow
+          $mouseEnter={mouseEnter}
+          onClick={() => paginate(-sliderOffset)}
         >
-          <Contents
-            variants={contentsVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            key={page}
-            transition={{ type: "tween", duration: 1 }}
-            custom={{ viewportWidth, direction }}
-            $sliderOffset={sliderOffset}
-          >
-            {data
-              .slice(
-                sliderOffset * imageIndex,
-                sliderOffset * imageIndex + sliderOffset
-              )
-              .map((item, index) => (
-                <Content
-                  isLoading={!!data}
-                  data={item}
-                  category={categoryId}
-                  id={item.id + ""}
-                  key={item.id}
-                  isFirstChild={index === 0}
-                  isLastChild={index === sliderOffset - 1}
-                />
-              ))}
-          </Contents>
-        </AnimatePresence>
-        <NextArrow>
-          <svg
-            onClick={() => paginate(1)}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-          >
-            <path d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z" />
-          </svg>
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+              <path d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z" />
+            </svg>
+          </div>
+        </PrevArrow>
+
+        <NextArrow
+          $mouseEnter={mouseEnter}
+          onClick={() => paginate(sliderOffset)}
+        >
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+              <path d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z" />
+            </svg>
+          </div>
         </NextArrow>
       </Main>
     </Wrapper>
