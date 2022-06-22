@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getTvShows, IGetMediaResult } from "../api";
+import { getTvShows, IGetMediaResult, MediaType } from "../api";
 import MainScreen from "../components/MainScreen";
 
 export enum TvCategories {
@@ -43,6 +43,7 @@ function Tv() {
     <>
       {!dataOnTheAir || !dataTopRated || !dataPopular ? null : (
         <MainScreen
+          mediaType={MediaType.TV}
           categories={[
             {
               categoryId: TvCategories.ON_THE_AIR,

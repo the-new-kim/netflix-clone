@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getMovies, IGetMediaResult } from "../api";
+import { getMovies, IGetMediaResult, MediaType } from "../api";
 import MainScreen from "../components/MainScreen";
 
 export enum MovieCategories {
@@ -40,6 +40,7 @@ function Movie() {
     <>
       {!dataNowPlaying || !dataTopRated || !dataPopular ? null : (
         <MainScreen
+          mediaType={MediaType.MOVIE}
           categories={[
             {
               categoryId: MovieCategories.NOW_PLAYING,

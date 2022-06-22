@@ -2,9 +2,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 import { useQuery } from "react-query";
-import { useMatch, useNavigate } from "react-router-dom";
+import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getMovieDetails, getTvDetails, MatchTypes } from "../api";
+import {
+  getMediaDetails,
+  getMovieDetails,
+  getTvDetails,
+  MatchTypes,
+} from "../api";
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -64,10 +69,13 @@ const Genres = styled.div``;
 const Description = styled.div``;
 const SimilarContents = styled.div``;
 
-function Detail() {
+interface IDetailProps {
+  matched: PathMatch<"category" | "mediaId"> | null;
+}
+
+function Detail({ matched }: IDetailProps) {
   const navigate = useNavigate();
-  const movieMatched = useMatch("/movie/:category/:mediaId");
-  // const tvMatched = useMatch("/tv/:category/:mediaId");
+
   // const [matchedType, setMatchedType] = useState<MatchTypes | null>(null);
 
   // useEffect(() => {
@@ -81,32 +89,46 @@ function Detail() {
   //   () => getMovieDetails(movieMatched?.params.mediaId || ""),
   //   {
   //     enabled: !!movieMatched,
+  //     suspense: false,
   //   }
   // );
 
+  const { data, isLoading } = useQuery(
+    ["detail", "movie", matched?.params.mediaId],
+    () => getMovieDetails(matched?.params.mediaId || ""),
+    {
+      enabled: !!matched,
+      suspense: false,
+    }
+  );
+
   // const isLoading = !movieMatched || !tvMatched || !data;
+
+  const loading = !data || isLoading;
 
   return (
     <>
-      {movieMatched && (
+      {
         <>
           <AnimatePresence>
-            <Wrapper
-              layoutId={`${
-                movieMatched.params.category! + movieMatched.params.mediaId
-              }`}
-              initial={false}
-            >
-              <Cover>cover</Cover>
-              <Title>title</Title>
-              <Genres>genres</Genres>
-              <Description>description</Description>
-              <SimilarContents>similar</SimilarContents>
-            </Wrapper>
+            {loading ? null : (
+              <Wrapper
+                layoutId={`${
+                  matched?.params.category || "" + matched?.params.mediaId || ""
+                }`}
+                initial={false}
+              >
+                <Cover>cover</Cover>
+                <Title>title</Title>
+                <Genres>genres</Genres>
+                <Description>description</Description>
+                <SimilarContents>similar</SimilarContents>
+              </Wrapper>
+            )}{" "}
+            <Overlay onClick={() => navigate(`/`)}></Overlay>
           </AnimatePresence>
-          <Overlay onClick={() => navigate("/movie")}></Overlay>
         </>
-      )}
+      }
     </>
   );
 }

@@ -42,7 +42,7 @@ interface IGenres {
   name: string;
 }
 
-export interface IGetMediaDetals {
+export interface IGetMediaDetails {
   backdrop_path: string;
   poster_path: string;
   genres: IGenres[];
@@ -56,6 +56,12 @@ export interface IGetMediaDetals {
 export enum MatchTypes {
   MOVIE = "movie",
   TV = "tv",
+}
+
+export function getMediaDetails(id: string | number, type: MatchTypes) {
+  return fetch(
+    `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
+  ).then((response) => response.json());
 }
 
 export function getMovieDetails(id: string | number) {
