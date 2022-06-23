@@ -1,6 +1,15 @@
+import { AnimatePresence } from "framer-motion";
 import { useQuery } from "react-query";
-import { getMovies, IGetMediaResult, MediaType } from "../api";
-import MainScreen from "../components/MainScreen";
+import { useMatch } from "react-router-dom";
+import {
+  getMovieDetails,
+  getMovies,
+  IGetMediaDetails,
+  IGetMediaResult,
+} from "../api";
+import Banner from "../components/Banner";
+import Detail from "../components/Detail";
+import Slider from "../components/Slider";
 
 export enum MovieCategories {
   NOW_PLAYING = "now_playing",
@@ -9,6 +18,8 @@ export enum MovieCategories {
 }
 
 function Movie() {
+  const movieMatched = useMatch("/movie/:category/:mediaId");
+
   const { data: dataNowPlaying } = useQuery<IGetMediaResult>(
     [MovieCategories.NOW_PLAYING, "movie"],
     () => getMovies(MovieCategories.NOW_PLAYING),
@@ -36,12 +47,21 @@ function Movie() {
     }
   );
 
+  const { data: dataDetail } = useQuery<IGetMediaDetails>(
+    ["detail", "movie", movieMatched?.params.mediaId],
+    () => getMovieDetails(movieMatched?.params.mediaId || ""),
+    {
+      suspense: false,
+      enabled: !!movieMatched,
+    }
+  );
+
   return (
     <>
       {!dataNowPlaying || !dataTopRated || !dataPopular ? null : (
-        <MainScreen
-          mediaType={MediaType.MOVIE}
-          categories={[
+        <>
+          <Banner data={dataNowPlaying} />
+          {[
             {
               categoryId: MovieCategories.NOW_PLAYING,
               title: "Now Playing",
@@ -57,9 +77,22 @@ function Movie() {
               title: "Popular",
               data: dataPopular,
             },
-          ]}
-        />
+          ].map((category, index) => (
+            <Slider
+              key={`movieSlider${index}`}
+              data={category.data.results}
+              title={category.title}
+              categoryId={category.categoryId}
+            />
+          ))}
+        </>
       )}
+
+      <AnimatePresence>
+        {dataDetail && (
+          <Detail dataDetail={dataDetail} matched={movieMatched} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

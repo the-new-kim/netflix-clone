@@ -51,6 +51,7 @@ export interface IGetMediaDetails {
   name?: string;
   overview: string;
   runtime: number;
+  release_date: string;
 }
 
 export enum MatchTypes {
@@ -58,11 +59,11 @@ export enum MatchTypes {
   TV = "tv",
 }
 
-export function getMediaDetails(id: string | number, type: MatchTypes) {
-  return fetch(
-    `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
-  ).then((response) => response.json());
-}
+// export function getMediaDetails(id: string | number, type: MatchTypes) {
+//   return fetch(
+//     `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
+//   ).then((response) => response.json());
+// }
 
 export function getMovieDetails(id: string | number) {
   return fetch(`${BASE_URL}movie/${id}?api_key=${API_KEY}&language=en-US`).then(
@@ -74,4 +75,20 @@ export function getTvDetails(id: string | number) {
   return fetch(`${BASE_URL}tv/${id}?api_key=${API_KEY}&language=en-US`).then(
     (response) => response.json()
   );
+}
+
+export function getSimilarMovies(id: string | number) {
+  return fetch(
+    `${BASE_URL}movie/${id}/similar?api_key=${API_KEY}&language=en-US`
+  ).then((response) => response.json());
+}
+
+export interface ISearchMediaResult {
+  results: IMedia[];
+}
+
+export function searchContents(keyword: string) {
+  return fetch(
+    `${BASE_URL}search/multi?api_key=${API_KEY}&language=en-US&query=${keyword}&page=1&include_adult=false`
+  ).then((response) => response.json());
 }

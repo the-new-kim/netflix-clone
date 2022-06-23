@@ -5,7 +5,10 @@ import styled from "styled-components";
 import { IMedia } from "../api";
 import { makeImagePath } from "../utils";
 
-const Wrapper = styled(motion.div)``;
+const Wrapper = styled(motion.div)`
+  border-radius: 5px;
+  overflow: hidden;
+`;
 
 const LayoutWrapper = styled(motion.div)`
   position: relative;
@@ -28,13 +31,15 @@ const NoCover = styled(motion.div)`
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-color: #3b3b3b;
+  background-color: ${(props) => props.theme.bgLightGray};
   aspect-ratio: 1.6/1;
 `;
 
-const Title = styled(motion.h3)`
-  background-color: #3b3b3b;
+const Title = styled(motion.h3)<{ $fromDetail?: boolean }>`
+  background-color: ${(props) =>
+    props.$fromDetail ? props.theme.bgLightGray : props.theme.bgDarkGray};
   padding: 5px;
+  height: 100%;
 `;
 
 interface IContentVariants {
@@ -45,15 +50,14 @@ interface IContentVariants {
 const contentVariants = {
   animate: ({ isFirstChild, isLastChild }: IContentVariants) => ({
     originX: isFirstChild ? 0 : isLastChild ? 1 : 0.5,
-    originY: 1,
+    originY: 0.8,
     scale: 1,
     boxShadow: "0px 0px 0px 0px rgba(0,0,0,0)",
     transition: { type: "tween" },
   }),
   hover: () => ({
     scale: 1.8,
-    // y: -30,
-    boxShadow: "0px 0px 50px 0px rgba(0,0,0,0.8)",
+    boxShadow: "0px 0px 10px 1px rgba(0,0,0,1)",
     transition: { delay: 0.5, type: "tween" },
   }),
 };
@@ -71,6 +75,7 @@ interface IContentProps {
   id: string;
   isFirstChild: boolean;
   isLastChild: boolean;
+  fromDetail?: boolean;
 }
 
 function Content({
@@ -79,11 +84,13 @@ function Content({
   id,
   isFirstChild,
   isLastChild,
+  fromDetail = false,
 }: IContentProps) {
   const navigate = useNavigate();
   const [showTitle, setShowTitle] = useState(false);
 
   const navigateToDetail = () => {
+    if (fromDetail) return;
     setShowTitle(false);
     navigate(`${category}/${id}`);
   };
@@ -91,6 +98,7 @@ function Content({
   return (
     <Wrapper
       layoutId={`${category + id}`}
+      key={`${category + id}`}
       onClick={navigateToDetail}
       onMouseEnter={() => {
         setShowTitle(true);
@@ -98,34 +106,48 @@ function Content({
       onMouseLeave={() => {
         setShowTitle(false);
       }}
+      variants={contentVariants}
+      initial={false}
+      animate="animate"
+      whileHover="hover"
+      custom={{ isFirstChild, isLastChild }}
     >
       <LayoutGroup>
-        <LayoutWrapper
-          layout
-          variants={contentVariants}
-          initial={false}
-          animate="animate"
-          whileHover="hover"
-          custom={{ isFirstChild, isLastChild }}
-        >
+        <LayoutWrapper layout>
           {data.backdrop_path ? (
-            <Cover layout $bgImg={makeImagePath(data.backdrop_path, "w500")} />
+            <Cover
+              layoutId={`${category + id}cover`}
+              key={`${category + id}cover`}
+              layout
+              $bgImg={makeImagePath(data.backdrop_path, "w500")}
+            />
           ) : (
-            <NoCover layout>{data.title || data.name}</NoCover>
+            <NoCover
+              layoutId={`${category + id}noCover`}
+              key={`${category + id}noCover`}
+              layout
+            >
+              {data.title || data.name}
+            </NoCover>
           )}
-          <AnimatePresence>
-            {showTitle && (
-              <Title
-                key="contentTitle"
-                variants={titleVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-              >
-                {data.title || data.name}
-              </Title>
-            )}
-          </AnimatePresence>
+
+          {fromDetail ? (
+            <Title $fromDetail={fromDetail}>{data.title || data.name}</Title>
+          ) : (
+            <AnimatePresence>
+              {showTitle && (
+                <Title
+                  key="contentTitle"
+                  variants={titleVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  {data.title || data.name}
+                </Title>
+              )}
+            </AnimatePresence>
+          )}
         </LayoutWrapper>
       </LayoutGroup>
     </Wrapper>

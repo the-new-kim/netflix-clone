@@ -1,15 +1,11 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-
+import { motion } from "framer-motion";
+import { useState } from "react";
 import { useQuery } from "react-query";
-import { PathMatch, useMatch, useNavigate } from "react-router-dom";
+import { PathMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import {
-  getMediaDetails,
-  getMovieDetails,
-  getTvDetails,
-  MatchTypes,
-} from "../api";
+import { getSimilarMovies, IGetMediaDetails, IGetMediaResult } from "../api";
+import { makeImagePath, toHoursAndMinutes } from "../utils";
+import Content from "./Content";
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -17,20 +13,23 @@ const Overlay = styled(motion.div)`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 100;
 `;
 
 const Wrapper = styled(motion.div)`
   position: fixed;
+  border-radius: 10px;
+  overflow-x: hidden;
 
   /* position: absolute; */
-  top: 0;
+  top: 100px;
   left: 0;
   right: 0;
   margin: auto;
-  width: 50vw;
-  max-width: 700px;
+  width: 70vw;
+  height: 80vh;
+  max-width: 950px;
 
   display: grid;
   grid-template-columns: 1fr;
@@ -42,7 +41,9 @@ const Wrapper = styled(motion.div)`
 `;
 
 const Cover = styled(motion.div)<{ $bgImg?: string }>`
-  background-image: url(${(props) => props.$bgImg});
+  position: relative;
+  background-image: linear-gradient(${(props) => props.theme.bgGradient}),
+    url(${(props) => props.$bgImg});
   background-size: cover;
   background-position: center center;
   width: 100%;
@@ -59,76 +60,207 @@ const NoCover = styled(motion.div)`
   aspect-ratio: 1.6/1;
 `;
 
-const Title = styled(motion.h3)`
-  background-color: #3b3b3b;
-  padding: 5px;
+const Title = styled(motion.h1)`
+  width: 75%;
+  font-size: 5vw;
+  font-weight: 700;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 3vw;
+  text-shadow: ${(props) => props.theme.titleShadow};
 `;
 
-const Genres = styled.div``;
+const Details = styled.div`
+  padding: 10px 50px;
+`;
 
-const Description = styled.div``;
-const SimilarContents = styled.div``;
+const Row = styled.div`
+  margin-bottom: 40px;
+  h2 {
+    font-size: 25px;
+    font-weight: 400;
+  }
+  > * {
+    margin-bottom: 10px;
+  }
+`;
+
+const Time = styled.div`
+  > *:not(:last-child) {
+    margin-right: 10px;
+  }
+`;
+
+const Overview = styled.div``;
+const Genres = styled.ul`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  > *:not(:last-child) {
+    margin-right: 10px;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: ${(props) => props.theme.textGray};
+  }
+  li {
+    color: ${(props) => props.theme.color};
+  }
+`;
+
+const SimilarContents = styled.div`
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  transform-style: preserve-3d;
+`;
+
+const overlayVariants = {
+  show: {
+    opacity: 1,
+  },
+  hide: {
+    opacity: 0,
+  },
+};
+
+const ContentWrapper = styled(motion.div)`
+  position: relative;
+  width: 100%;
+  height: 20.5%;
+`;
 
 interface IDetailProps {
+  dataDetail: IGetMediaDetails;
   matched: PathMatch<"category" | "mediaId"> | null;
 }
 
-function Detail({ matched }: IDetailProps) {
+function Detail({ dataDetail, matched }: IDetailProps) {
+  const [clickable, setClickable] = useState(true);
   const navigate = useNavigate();
 
-  // const [matchedType, setMatchedType] = useState<MatchTypes | null>(null);
+  const goBack = () => {
+    if (!clickable) return;
+    setClickable(false);
+    navigate(-1);
+  };
 
-  // useEffect(() => {
-  //   setMatchedType(
-  //     movieMatched ? MatchTypes.MOVIE : tvMatched ? MatchTypes.TV : null
-  //   );
-  // }, [movieMatched, tvMatched]);
-
-  // const { data } = useQuery(
-  //   ["detail", "movie", movieMatched?.params.mediaId],
-  //   () => getMovieDetails(movieMatched?.params.mediaId || ""),
-  //   {
-  //     enabled: !!movieMatched,
-  //     suspense: false,
-  //   }
-  // );
-
-  const { data, isLoading } = useQuery(
-    ["detail", "movie", matched?.params.mediaId],
-    () => getMovieDetails(matched?.params.mediaId || ""),
-    {
-      enabled: !!matched,
-      suspense: false,
-    }
-  );
-
-  // const isLoading = !movieMatched || !tvMatched || !data;
-
-  const loading = !data || isLoading;
+  const { isLoading: loadingSimilar, data: dataSimilar } =
+    useQuery<IGetMediaResult>(
+      ["similar", matched?.params.mediaId],
+      () => getSimilarMovies(matched?.params.mediaId || ""),
+      {
+        keepPreviousData: true,
+        enabled: !!matched,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        suspense: false,
+      }
+    );
 
   return (
     <>
-      {
+      {matched === null ||
+      !matched.params.category ||
+      !matched.params.mediaId ? null : (
         <>
-          <AnimatePresence>
-            {loading ? null : (
-              <Wrapper
+          <Wrapper
+            layoutId={`${matched.params.category + matched.params.mediaId}`}
+            key={matched.params.mediaId}
+            exit={{ opacity: 0 }}
+          >
+            {dataDetail ? (
+              <Cover
                 layoutId={`${
-                  matched?.params.category || "" + matched?.params.mediaId || ""
-                }`}
-                initial={false}
+                  matched.params.category + matched.params.mediaId
+                }cover`}
+                $bgImg={makeImagePath(dataDetail.backdrop_path)}
               >
-                <Cover>cover</Cover>
-                <Title>title</Title>
-                <Genres>genres</Genres>
-                <Description>description</Description>
-                <SimilarContents>similar</SimilarContents>
-              </Wrapper>
-            )}{" "}
-            <Overlay onClick={() => navigate(`/`)}></Overlay>
-          </AnimatePresence>
+                <Title>{dataDetail.title || dataDetail.name}</Title>
+              </Cover>
+            ) : (
+              <NoCover
+                layoutId={`${
+                  matched.params.category + matched.params.mediaId
+                }noCover`}
+              ></NoCover>
+            )}
+            <Details>
+              <Row>
+                <Time>
+                  {dataDetail.release_date && (
+                    <span>
+                      {new Date(dataDetail.release_date).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                        }
+                      )}
+                    </span>
+                  )}
+                  {dataDetail.runtime && (
+                    <span>{toHoursAndMinutes(dataDetail.runtime)}</span>
+                  )}
+                </Time>
+                {dataDetail.overview && (
+                  <Overview>{dataDetail.overview}</Overview>
+                )}
+
+                {dataDetail.genres && !!dataDetail.genres.length && (
+                  <Genres>
+                    <h5>Genres:</h5>
+                    {dataDetail.genres.map((genre, index) => (
+                      <li key={genre.name}>
+                        {genre.name}
+                        {index !== dataDetail.genres.length - 1 ? "," : null}
+                      </li>
+                    ))}
+                  </Genres>
+                )}
+              </Row>
+              {!dataSimilar || !dataSimilar.results.length ? null : (
+                <Row>
+                  <h2>Similar Contents</h2>
+                  <SimilarContents>
+                    {dataSimilar.results.map((result, index) => (
+                      <ContentWrapper
+                        key={result.id}
+                        animate={{ z: 0 }}
+                        whileHover={{
+                          z: 100,
+                        }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <Content
+                          isLoading={!!dataDetail}
+                          data={result}
+                          category={""}
+                          id={result.id + ""}
+                          isFirstChild={index === 0 || index % 3 === 0}
+                          isLastChild={index === 2 || (index - 2) % 3 === 0}
+                          fromDetail={true}
+                        />
+                      </ContentWrapper>
+                    ))}
+                  </SimilarContents>
+                </Row>
+              )}
+            </Details>
+          </Wrapper>
         </>
-      }
+      )}
+      <Overlay
+        variants={overlayVariants}
+        initial="hide"
+        animate="show"
+        exit="hide"
+        transition={{ duration: 1 }}
+        onClick={goBack}
+      />
     </>
   );
 }
