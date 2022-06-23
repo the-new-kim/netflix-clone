@@ -38,7 +38,7 @@ const NoCover = styled(motion.div)`
 const Title = styled(motion.h3)<{ $fromDetail?: boolean }>`
   background-color: ${(props) =>
     props.$fromDetail ? props.theme.bgLightGray : props.theme.bgDarkGray};
-  padding: 5px;
+  padding: 10px;
   height: 100%;
 `;
 
@@ -114,12 +114,15 @@ function Content({
     >
       <LayoutGroup>
         <LayoutWrapper layout>
-          {data.backdrop_path ? (
+          {data.backdrop_path || data.poster_path ? (
             <Cover
               layoutId={`${category + id}cover`}
               key={`${category + id}cover`}
               layout
-              $bgImg={makeImagePath(data.backdrop_path, "w500")}
+              $bgImg={makeImagePath(
+                data.backdrop_path || data.poster_path,
+                "w500"
+              )}
             />
           ) : (
             <NoCover

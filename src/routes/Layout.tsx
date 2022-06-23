@@ -6,7 +6,7 @@ import Header from "../components/Header";
 
 const Wrapper = styled(motion.div)`
   width: 100%;
-  padding-bottom: 500px;
+  padding-bottom: 50px;
   overflow-x: hidden;
 `;
 

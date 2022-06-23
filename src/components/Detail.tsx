@@ -21,8 +21,6 @@ const Wrapper = styled(motion.div)`
   position: fixed;
   border-radius: 10px;
   overflow-x: hidden;
-
-  /* position: absolute; */
   top: 100px;
   left: 0;
   right: 0;
@@ -41,32 +39,48 @@ const Wrapper = styled(motion.div)`
 `;
 
 const Cover = styled(motion.div)<{ $bgImg?: string }>`
-  position: relative;
   background-image: linear-gradient(${(props) => props.theme.bgGradient}),
     url(${(props) => props.$bgImg});
   background-size: cover;
   background-position: center center;
   width: 100%;
   aspect-ratio: 1.6/1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
 `;
 
 const NoCover = styled(motion.div)`
   width: 100%;
+  aspect-ratio: 1.6/1;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  background-color: #3b3b3b;
-  aspect-ratio: 1.6/1;
+`;
+
+const CloseBtn = styled.button`
+  cursor: pointer;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  top: 10px;
+  right: 10px;
+  background-color: ${(props) => props.theme.bgDarkGray};
+  border: none;
+  color: ${(props) => props.theme.color};
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.8);
+  font-size: 17px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Title = styled(motion.h1)`
   width: 75%;
   font-size: 5vw;
   font-weight: 700;
-  position: absolute;
-  bottom: 0;
-  left: 0;
+
   padding: 3vw;
   text-shadow: ${(props) => props.theme.titleShadow};
 `;
@@ -131,7 +145,7 @@ const overlayVariants = {
 const ContentWrapper = styled(motion.div)`
   position: relative;
   width: 100%;
-  height: 20.5%;
+  height: fit-content;
 `;
 
 interface IDetailProps {
@@ -149,18 +163,17 @@ function Detail({ dataDetail, matched }: IDetailProps) {
     navigate(-1);
   };
 
-  const { isLoading: loadingSimilar, data: dataSimilar } =
-    useQuery<IGetMediaResult>(
-      ["similar", matched?.params.mediaId],
-      () => getSimilarMovies(matched?.params.mediaId || ""),
-      {
-        keepPreviousData: true,
-        enabled: !!matched,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        suspense: false,
-      }
-    );
+  const { data: dataSimilar } = useQuery<IGetMediaResult>(
+    ["similar", matched?.params.mediaId],
+    () => getSimilarMovies(matched?.params.mediaId || ""),
+    {
+      keepPreviousData: true,
+      enabled: !!matched,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      suspense: false,
+    }
+  );
 
   return (
     <>
@@ -173,13 +186,14 @@ function Detail({ dataDetail, matched }: IDetailProps) {
             key={matched.params.mediaId}
             exit={{ opacity: 0 }}
           >
-            {dataDetail ? (
+            {dataDetail.backdrop_path ? (
               <Cover
                 layoutId={`${
                   matched.params.category + matched.params.mediaId
                 }cover`}
                 $bgImg={makeImagePath(dataDetail.backdrop_path)}
               >
+                <CloseBtn onClick={goBack}>&#10005;</CloseBtn>
                 <Title>{dataDetail.title || dataDetail.name}</Title>
               </Cover>
             ) : (
@@ -187,7 +201,10 @@ function Detail({ dataDetail, matched }: IDetailProps) {
                 layoutId={`${
                   matched.params.category + matched.params.mediaId
                 }noCover`}
-              ></NoCover>
+              >
+                <CloseBtn onClick={goBack}>&#10005;</CloseBtn>
+                <Title>{dataDetail.title || dataDetail.name}</Title>
+              </NoCover>
             )}
             <Details>
               <Row>

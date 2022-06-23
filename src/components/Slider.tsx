@@ -9,7 +9,7 @@ import Content from "./Content";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
-  top: -100px;
+  top: -15vw;
   margin-bottom: 5vw;
 `;
 const Title = styled.h1`
@@ -17,8 +17,17 @@ const Title = styled.h1`
   font-weight: bold;
   padding: 10px;
 `;
-const Main = styled.div<{ $sliderOffset: number }>`
+// const Main = styled.div<{ $sliderOffset: number }>`
+//   position: relative;
+
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: center;
+// `;
+const Row = styled.div<{ $sliderOffset: number }>`
   position: relative;
+  width: 100%;
+
   height: ${(props) =>
     props.$sliderOffset === 6
       ? 10.1
@@ -27,14 +36,7 @@ const Main = styled.div<{ $sliderOffset: number }>`
       : props.$sliderOffset === 3
       ? 20.5
       : 31}vw;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
-const Row = styled.div<{ $sliderOffset: number }>`
-  position: relative;
-  width: 100%;
-  height: 100%;
+
   display: grid;
   gap: 10px;
   grid-template-columns: ${(props) => `repeat(${props.$sliderOffset}, 1fr)`};
@@ -68,7 +70,7 @@ const NextArrow = styled(motion.div)<{ $arrowShowing: boolean }>`
 
   cursor: pointer;
 
-  /* ::after {
+  ::after {
     position: absolute;
     top: 0;
     right: 0;
@@ -80,7 +82,7 @@ const NextArrow = styled(motion.div)<{ $arrowShowing: boolean }>`
       rgba(0, 0, 0, 0) 0%,
       rgba(0, 0, 0, 1) 100%
     );
-  } */
+  }
 
   > div {
     width: 100%;
@@ -165,48 +167,48 @@ function Slider({ data, title, categoryId }: ISliderProps) {
   return (
     <Wrapper>
       <Title>{title}</Title>
-      <Main
+
+      <Row
         $sliderOffset={sliderOffset}
+        ref={rowRef}
         onMouseEnter={() => setArrowShowing(true)}
         onMouseLeave={() => setArrowShowing(false)}
       >
-        <Row $sliderOffset={sliderOffset} ref={rowRef}>
-          {Array.from(Array(sliderOffset)).map((_, index) => (
-            <Column
-              key={index}
-              animate={{ z: 0 }}
-              whileHover={{
-                z: 100,
-              }}
-              transition={{ delay: 0.5 }}
+        {Array.from(Array(sliderOffset)).map((_, index) => (
+          <Column
+            key={index}
+            animate={{ z: 0 }}
+            whileHover={{
+              z: 100,
+            }}
+            transition={{ delay: 0.5 }}
+          >
+            <AnimatePresence
+              initial={false}
+              custom={{ direction, rowWidth }}
+              onExitComplete={() => setIsSliding(false)}
             >
-              <AnimatePresence
-                initial={false}
+              <ContentWrapper
+                key={page + index}
+                variants={contentWrapperVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
                 custom={{ direction, rowWidth }}
-                onExitComplete={() => setIsSliding(false)}
+                transition={{ x: { type: "tween", duration: 1 } }}
               >
-                <ContentWrapper
-                  key={page + index}
-                  variants={contentWrapperVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  custom={{ direction, rowWidth }}
-                  transition={{ x: { type: "tween", duration: 1 } }}
-                >
-                  <Content
-                    isLoading={!!data}
-                    data={data[dataIndex + index]}
-                    category={categoryId}
-                    id={data[dataIndex + index].id + ""}
-                    isFirstChild={index === 0}
-                    isLastChild={index === sliderOffset - 1}
-                  />
-                </ContentWrapper>
-              </AnimatePresence>
-            </Column>
-          ))}
-        </Row>
+                <Content
+                  isLoading={!!data}
+                  data={data[dataIndex + index]}
+                  category={categoryId}
+                  id={data[dataIndex + index].id + ""}
+                  isFirstChild={index === 0}
+                  isLastChild={index === sliderOffset - 1}
+                />
+              </ContentWrapper>
+            </AnimatePresence>
+          </Column>
+        ))}{" "}
         <PrevArrow
           $arrowShowing={arrowShowing}
           onClick={() => paginate(-sliderOffset)}
@@ -217,7 +219,6 @@ function Slider({ data, title, categoryId }: ISliderProps) {
             </svg>
           </div>
         </PrevArrow>
-
         <NextArrow
           $arrowShowing={arrowShowing}
           onClick={() => paginate(sliderOffset)}
@@ -228,7 +229,7 @@ function Slider({ data, title, categoryId }: ISliderProps) {
             </svg>
           </div>
         </NextArrow>
-      </Main>
+      </Row>
     </Wrapper>
   );
 }

@@ -100,7 +100,6 @@ interface IForm {
 function Header() {
   //Nav
   const navigate = useNavigate();
-  const homeMatch = useMatch("/");
   const movieMatch = useMatch("/movie");
   const tvMatch = useMatch("/tv");
 

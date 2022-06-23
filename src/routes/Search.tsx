@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 
 const Text = styled.p`
   height: 20vw;
-  max-height: 100px;
+  max-height: 150px;
   margin-bottom: 20px;
   display: flex;
   justify-content: flex-start;
@@ -28,7 +28,7 @@ const Results = styled.div<{ $sliderOffset: number }>`
   height: 100%;
   display: grid;
   gap: 10px;
-  row-gap: 30px;
+  row-gap: 60px;
   grid-template-columns: ${(props) => `repeat(${props.$sliderOffset}, 1fr)`};
   transform-style: preserve-3d;
 `;

@@ -48,7 +48,7 @@ function Tv() {
   );
 
   const { data: dataDetail } = useQuery<IGetMediaDetails>(
-    ["detail", "movie", tvMatched?.params.mediaId],
+    ["detail", "tv", tvMatched?.params.mediaId],
     () => getTvDetails(tvMatched?.params.mediaId || ""),
     {
       suspense: false,
