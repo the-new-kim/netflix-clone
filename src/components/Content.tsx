@@ -87,11 +87,11 @@ function Content({
   fromDetail = false,
 }: IContentProps) {
   const navigate = useNavigate();
-  const [showTitle, setShowTitle] = useState(false);
+  const [titleShowing, setTitleShowing] = useState(false);
 
   const navigateToDetail = () => {
     if (fromDetail) return;
-    setShowTitle(false);
+    setTitleShowing(false);
     navigate(`${category}/${id}`);
   };
 
@@ -101,10 +101,10 @@ function Content({
       key={`${category + id}`}
       onClick={navigateToDetail}
       onMouseEnter={() => {
-        setShowTitle(true);
+        setTitleShowing(true);
       }}
       onMouseLeave={() => {
-        setShowTitle(false);
+        setTitleShowing(false);
       }}
       variants={contentVariants}
       initial={false}
@@ -138,7 +138,7 @@ function Content({
             <Title $fromDetail={fromDetail}>{data.title || data.name}</Title>
           ) : (
             <AnimatePresence>
-              {showTitle && (
+              {titleShowing && (
                 <Title
                   key="contentTitle"
                   variants={titleVariants}

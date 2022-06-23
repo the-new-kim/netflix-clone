@@ -92,3 +92,26 @@ export function searchContents(keyword: string) {
     `${BASE_URL}search/multi?api_key=${API_KEY}&language=en-US&query=${keyword}&page=1&include_adult=false`
   ).then((response) => response.json());
 }
+
+export interface ITrailer {
+  key: string;
+  site: string;
+  type: string;
+}
+
+export interface IGetTrailersResult {
+  id: number;
+  results: ITrailer[];
+}
+
+export function getMovieTrailers(id: string | number) {
+  return fetch(
+    `${BASE_URL}movie/${id}/videos?api_key=${API_KEY}&language=en-US`
+  ).then((response) => response.json());
+}
+
+export function getTvShowTrailers(id: string | number) {
+  return fetch(
+    `${BASE_URL}tv/${id}/videos?api_key=${API_KEY}&language=en-US`
+  ).then((response) => response.json());
+}

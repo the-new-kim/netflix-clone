@@ -6,6 +6,7 @@ import {
   getTvShows,
   IGetMediaDetails,
   IGetMediaResult,
+  MatchTypes,
 } from "../api";
 import Banner from "../components/Banner";
 import Detail from "../components/Detail";
@@ -15,6 +16,7 @@ export enum TvCategories {
   ON_THE_AIR = "on_the_air",
   TOP_RATED = "top_rated",
   POPULAR = "popular",
+  AIRING_TODAY = "airing_today",
 }
 
 function Tv() {
@@ -47,6 +49,15 @@ function Tv() {
     }
   );
 
+  const { data: dataAiringToday } = useQuery<IGetMediaResult>(
+    [TvCategories.AIRING_TODAY, "tv"],
+    () => getTvShows(TvCategories.AIRING_TODAY),
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
   const { data: dataDetail } = useQuery<IGetMediaDetails>(
     ["detail", "tv", tvMatched?.params.mediaId],
     () => getTvDetails(tvMatched?.params.mediaId || ""),
@@ -58,9 +69,12 @@ function Tv() {
 
   return (
     <>
-      {!dataOnTheAir || !dataTopRated || !dataPopular ? null : (
+      {!dataOnTheAir ||
+      !dataTopRated ||
+      !dataPopular ||
+      !dataAiringToday ? null : (
         <>
-          <Banner data={dataOnTheAir} />
+          <Banner bannerData={dataOnTheAir} matchedType={MatchTypes.TV} />
           {[
             {
               categoryId: TvCategories.ON_THE_AIR,
@@ -76,6 +90,11 @@ function Tv() {
               categoryId: TvCategories.POPULAR,
               title: "Popular",
               data: dataPopular,
+            },
+            {
+              categoryId: TvCategories.AIRING_TODAY,
+              title: "Airing Today",
+              data: dataAiringToday,
             },
           ].map((category, index) => (
             <Slider

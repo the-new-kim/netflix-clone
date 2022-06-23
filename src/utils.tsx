@@ -8,3 +8,7 @@ export function toHoursAndMinutes(totalMinutes: number) {
 
   return `${hours}:${minutes}`;
 }
+
+export function makeTrailerPath(key: string) {
+  return `https://www.youtube.com/embed/${key}?autoplay=1&mute=1&controls=1`;
+}

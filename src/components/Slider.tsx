@@ -9,8 +9,8 @@ import Content from "./Content";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
-  top: -15vw;
-  margin-bottom: 5vw;
+  top: -12vw;
+  margin-bottom: 4vw;
 `;
 const Title = styled.h1`
   font-size: 30px;

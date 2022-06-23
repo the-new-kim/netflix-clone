@@ -6,6 +6,7 @@ import {
   getMovies,
   IGetMediaDetails,
   IGetMediaResult,
+  MatchTypes,
 } from "../api";
 import Banner from "../components/Banner";
 import Detail from "../components/Detail";
@@ -15,6 +16,8 @@ export enum MovieCategories {
   NOW_PLAYING = "now_playing",
   TOP_RATED = "top_rated",
   POPULAR = "popular",
+  UPCOMING = "upcoming",
+  LATEST = "latest",
 }
 
 function Movie() {
@@ -32,6 +35,15 @@ function Movie() {
   const { data: dataTopRated } = useQuery<IGetMediaResult>(
     [MovieCategories.TOP_RATED, "movie"],
     () => getMovies(MovieCategories.TOP_RATED),
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const { data: dataUpcoming } = useQuery<IGetMediaResult>(
+    [MovieCategories.UPCOMING, "movie"],
+    () => getMovies(MovieCategories.UPCOMING),
     {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
@@ -58,9 +70,12 @@ function Movie() {
 
   return (
     <>
-      {!dataNowPlaying || !dataTopRated || !dataPopular ? null : (
+      {!dataNowPlaying ||
+      !dataTopRated ||
+      !dataUpcoming ||
+      !dataPopular ? null : (
         <>
-          <Banner data={dataNowPlaying} />
+          <Banner bannerData={dataNowPlaying} matchedType={MatchTypes.MOVIE} />
           {[
             {
               categoryId: MovieCategories.NOW_PLAYING,
@@ -73,8 +88,13 @@ function Movie() {
               data: dataTopRated,
             },
             {
+              categoryId: MovieCategories.UPCOMING,
+              title: "Upcoming Movies",
+              data: dataUpcoming,
+            },
+            {
               categoryId: MovieCategories.POPULAR,
-              title: "Popular",
+              title: "Popular Movies",
               data: dataPopular,
             },
           ].map((category, index) => (
