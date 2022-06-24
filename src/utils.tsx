@@ -10,5 +10,5 @@ export function toHoursAndMinutes(totalMinutes: number) {
 }
 
 export function makeTrailerPath(key: string) {
-  return `https://www.youtube.com/embed/${key}?autoplay=1&mute=1&controls=1`;
+  return `https://www.youtube.com/embed/${key}?rel=0&modestbranding=1&autohide=1&showinfo=0&controls=0&autoplay=1&mute=1`;
 }

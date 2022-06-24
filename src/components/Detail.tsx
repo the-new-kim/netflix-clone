@@ -3,9 +3,16 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { PathMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getSimilarMovies, IGetMediaDetails, IGetMediaResult } from "../api";
+import {
+  getSimilarMovies,
+  getSimilarTvShows,
+  IGetMediaDetails,
+  IGetMediaResult,
+  MediaTypes,
+} from "../api";
 import { makeImagePath, toHoursAndMinutes } from "../utils";
 import Content from "./Content";
+import Trailer from "./Trailer";
 
 const Overlay = styled(motion.div)`
   position: fixed;
@@ -13,7 +20,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 100;
 `;
 
@@ -39,15 +46,27 @@ const Wrapper = styled(motion.div)`
 `;
 
 const Cover = styled(motion.div)<{ $bgImg?: string }>`
-  background-image: linear-gradient(${(props) => props.theme.bgGradient}),
-    url(${(props) => props.$bgImg});
+  position: relative;
+  background-image: url(${(props) => props.$bgImg});
+
   background-size: cover;
   background-position: center center;
   width: 100%;
   aspect-ratio: 1.6/1;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-end;
+  justify-content: center;
+  align-items: center;
+`;
+
+const TrailerWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  > div {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const NoCover = styled(motion.div)`
@@ -56,6 +75,15 @@ const NoCover = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const GradientBg = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(${(props) => props.theme.bgGradient});
 `;
 
 const CloseBtn = styled.button`
@@ -74,13 +102,17 @@ const CloseBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 2;
 `;
 
 const Title = styled(motion.h1)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 75%;
   font-size: 5vw;
   font-weight: 700;
-
+  z-index: 1;
   padding: 3vw;
   text-shadow: ${(props) => props.theme.titleShadow};
 `;
@@ -151,9 +183,10 @@ const ContentWrapper = styled(motion.div)`
 interface IDetailProps {
   dataDetail: IGetMediaDetails;
   matched: PathMatch<"category" | "mediaId"> | null;
+  mediaType: MediaTypes;
 }
 
-function Detail({ dataDetail, matched }: IDetailProps) {
+function Detail({ dataDetail, matched, mediaType }: IDetailProps) {
   const [clickable, setClickable] = useState(true);
   const navigate = useNavigate();
 
@@ -164,8 +197,11 @@ function Detail({ dataDetail, matched }: IDetailProps) {
   };
 
   const { data: dataSimilar } = useQuery<IGetMediaResult>(
-    ["similar", matched?.params.mediaId],
-    () => getSimilarMovies(matched?.params.mediaId || ""),
+    ["similar", mediaType, matched?.params.mediaId],
+    () =>
+      mediaType === MediaTypes.MOVIE
+        ? getSimilarMovies(matched?.params.mediaId || "")
+        : getSimilarTvShows(matched?.params.mediaId || ""),
     {
       keepPreviousData: true,
       enabled: !!matched,
@@ -193,8 +229,18 @@ function Detail({ dataDetail, matched }: IDetailProps) {
                 }cover`}
                 $bgImg={makeImagePath(dataDetail.backdrop_path)}
               >
+                <TrailerWrapper>
+                  <Trailer
+                    mediaId={dataDetail.id}
+                    mediaType={mediaType}
+                    key={mediaType + dataDetail.id}
+                    fromBanner={false}
+                    fromDetail={true}
+                  />
+                </TrailerWrapper>
                 <CloseBtn onClick={goBack}>&#10005;</CloseBtn>
                 <Title>{dataDetail.title || dataDetail.name}</Title>
+                <GradientBg />
               </Cover>
             ) : (
               <NoCover
@@ -260,6 +306,7 @@ function Detail({ dataDetail, matched }: IDetailProps) {
                           isFirstChild={index === 0 || index % 3 === 0}
                           isLastChild={index === 2 || (index - 2) % 3 === 0}
                           fromDetail={true}
+                          mediaType={mediaType}
                         />
                       </ContentWrapper>
                     ))}

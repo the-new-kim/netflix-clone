@@ -6,7 +6,7 @@ import {
   getTvShows,
   IGetMediaDetails,
   IGetMediaResult,
-  MatchTypes,
+  MediaTypes,
 } from "../api";
 import Banner from "../components/Banner";
 import Detail from "../components/Detail";
@@ -74,7 +74,7 @@ function Tv() {
       !dataPopular ||
       !dataAiringToday ? null : (
         <>
-          <Banner bannerData={dataOnTheAir} matchedType={MatchTypes.TV} />
+          <Banner bannerData={dataOnTheAir} mediaType={MediaTypes.TV} />
           {[
             {
               categoryId: TvCategories.ON_THE_AIR,
@@ -102,12 +102,19 @@ function Tv() {
               data={category.data.results}
               title={category.title}
               categoryId={category.categoryId}
+              mediaType={MediaTypes.TV}
             />
           ))}
         </>
       )}
       <AnimatePresence>
-        {dataDetail && <Detail dataDetail={dataDetail} matched={tvMatched} />}
+        {dataDetail && (
+          <Detail
+            dataDetail={dataDetail}
+            matched={tvMatched}
+            mediaType={MediaTypes.TV}
+          />
+        )}
       </AnimatePresence>
     </>
   );

@@ -6,7 +6,7 @@ import {
   getMovies,
   IGetMediaDetails,
   IGetMediaResult,
-  MatchTypes,
+  MediaTypes,
 } from "../api";
 import Banner from "../components/Banner";
 import Detail from "../components/Detail";
@@ -75,7 +75,7 @@ function Movie() {
       !dataUpcoming ||
       !dataPopular ? null : (
         <>
-          <Banner bannerData={dataNowPlaying} matchedType={MatchTypes.MOVIE} />
+          <Banner bannerData={dataNowPlaying} mediaType={MediaTypes.MOVIE} />
           {[
             {
               categoryId: MovieCategories.NOW_PLAYING,
@@ -103,6 +103,7 @@ function Movie() {
               data={category.data.results}
               title={category.title}
               categoryId={category.categoryId}
+              mediaType={MediaTypes.MOVIE}
             />
           ))}
         </>
@@ -110,7 +111,11 @@ function Movie() {
 
       <AnimatePresence>
         {dataDetail && (
-          <Detail dataDetail={dataDetail} matched={movieMatched} />
+          <Detail
+            dataDetail={dataDetail}
+            matched={movieMatched}
+            mediaType={MediaTypes.MOVIE}
+          />
         )}
       </AnimatePresence>
     </>

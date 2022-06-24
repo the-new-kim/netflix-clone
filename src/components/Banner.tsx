@@ -1,15 +1,7 @@
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { useEffect, useLayoutEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  getMovieTrailers,
-  getTvShowTrailers,
-  IGetMediaResult,
-  IGetTrailersResult,
-  ITrailer,
-  MatchTypes,
-} from "../api";
+import { IGetMediaResult, MediaTypes } from "../api";
 import { makeImagePath } from "../utils";
 import Trailer from "./Trailer";
 
@@ -59,13 +51,14 @@ const Texts = styled(motion.div)`
 `;
 
 const Title = styled(motion.h1)`
-  font-size: 5vw;
-  margin-bottom: 30px;
+  font-size: 7vw;
+
   font-weight: 700;
   width: 70%;
   text-shadow: ${(props) => props.theme.titleShadow};
 `;
 const Overview = styled(motion.p)`
+  padding-top: 30px;
   width: 60%;
   font-size: 1.5vw;
   text-shadow: 0px 0px 30px rgba(0, 0, 0, 0.6);
@@ -73,43 +66,21 @@ const Overview = styled(motion.p)`
 
 interface IBannerProps {
   bannerData: IGetMediaResult;
-  matchedType: MatchTypes;
+  mediaType: MediaTypes;
 }
 
-function Banner({ bannerData, matchedType }: IBannerProps) {
-  const [randomIndex, setRandomIndex] = useState(19);
-  const [trailer, setTrailer] = useState<ITrailer | null>(null);
+function Banner({ bannerData, mediaType }: IBannerProps) {
+  const [randomIndex, setRandomIndex] = useState(0);
   const [overviewShowing, setOverviewShowing] = useState(true);
 
-  const { data: dataTrailers } = useQuery<IGetTrailersResult>(
-    ["video", bannerData.results[randomIndex].id],
-    () =>
-      matchedType === MatchTypes.MOVIE
-        ? getMovieTrailers(bannerData.results[randomIndex].id)
-        : getTvShowTrailers(bannerData.results[randomIndex].id),
-    {
-      suspense: false,
-    }
-  );
+  // useEffect(() => {
+  //   console.log("trailer:", trailer, "overview:", overviewShowing);
+  // }, [trailer, overviewShowing]);
 
-  useEffect(() => {
-    console.log("trailer:", trailer, "overview:", overviewShowing);
-  }, [trailer, overviewShowing]);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!bannerData.results.length) return;
     setRandomIndex(Math.floor(Math.random() * bannerData.results.length));
   }, [bannerData]);
-
-  useEffect(() => {
-    if (!dataTrailers || !dataTrailers.results.length) return;
-
-    const matched = dataTrailers.results.find(
-      (result) =>
-        result.site.match(/you\s*tube\s*/gi) && result.type.match(/trailer/gi)
-    );
-    setTrailer(matched || null);
-  }, [dataTrailers]);
 
   return (
     <Wrapper>
@@ -120,15 +91,14 @@ function Banner({ bannerData, matchedType }: IBannerProps) {
         )}
       />
 
-      <AnimatePresence>
-        {trailer && (
-          <Trailer
-            trailer={trailer}
-            setTrailer={setTrailer}
-            setOverviewShowing={setOverviewShowing}
-          />
-        )}
-      </AnimatePresence>
+      <Trailer
+        mediaId={bannerData.results[randomIndex].id}
+        mediaType={mediaType}
+        key={mediaType + bannerData.results[randomIndex].id}
+        fromBanner
+        setOverviewShowing={setOverviewShowing}
+      />
+
       <GradientBg />
       <LayoutGroup>
         <Texts layout>
@@ -139,7 +109,7 @@ function Banner({ bannerData, matchedType }: IBannerProps) {
               opacity: 1,
               originY: 0,
               originX: 0,
-              scale: overviewShowing ? 1 : 0.8,
+              scale: overviewShowing ? 1 : 0.6,
               transition: { duration: 1 },
             }}
           >

@@ -1,7 +1,7 @@
 const API_KEY = "d6e929621d2bfdd3c585aedf3aa51b87";
 const BASE_URL = "https://api.themoviedb.org/3/";
 
-export enum MediaType {
+export enum MediaTypes {
   MOVIE = "movie",
   TV = "tv",
   PERSON = "person",
@@ -14,7 +14,7 @@ export interface IMedia {
   overview: string;
   title?: string;
   name?: string;
-  media_type?: MediaType;
+  media_type: MediaTypes;
 }
 
 export interface IGetMediaResult {
@@ -59,12 +59,6 @@ export enum MatchTypes {
   TV = "tv",
 }
 
-// export function getMediaDetails(id: string | number, type: MatchTypes) {
-//   return fetch(
-//     `${BASE_URL}${type}/${id}?api_key=${API_KEY}&language=en-US`
-//   ).then((response) => response.json());
-// }
-
 export function getMovieDetails(id: string | number) {
   return fetch(`${BASE_URL}movie/${id}?api_key=${API_KEY}&language=en-US`).then(
     (response) => response.json()
@@ -80,6 +74,12 @@ export function getTvDetails(id: string | number) {
 export function getSimilarMovies(id: string | number) {
   return fetch(
     `${BASE_URL}movie/${id}/similar?api_key=${API_KEY}&language=en-US`
+  ).then((response) => response.json());
+}
+
+export function getSimilarTvShows(id: string | number) {
+  return fetch(
+    `${BASE_URL}tv/${id}/similar?api_key=${API_KEY}&language=en-US`
   ).then((response) => response.json());
 }
 

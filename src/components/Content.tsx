@@ -1,9 +1,10 @@
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { IMedia } from "../api";
+import { IMedia, MediaTypes } from "../api";
 import { makeImagePath } from "../utils";
+import Trailer from "./Trailer";
 
 const Wrapper = styled(motion.div)`
   border-radius: 5px;
@@ -18,11 +19,27 @@ const LayoutWrapper = styled(motion.div)`
 `;
 
 const Cover = styled(motion.div)<{ $bgImg: string }>`
+  position: relative;
   background-image: url(${(props) => props.$bgImg});
   background-size: cover;
   background-position: center center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   aspect-ratio: 1.6/1;
+  overflow: hidden;
+`;
+
+const TrailerWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  > div {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const NoCover = styled(motion.div)`
@@ -76,6 +93,7 @@ interface IContentProps {
   isFirstChild: boolean;
   isLastChild: boolean;
   fromDetail?: boolean;
+  mediaType: MediaTypes;
 }
 
 function Content({
@@ -85,9 +103,11 @@ function Content({
   isFirstChild,
   isLastChild,
   fromDetail = false,
+  mediaType,
 }: IContentProps) {
   const navigate = useNavigate();
   const [titleShowing, setTitleShowing] = useState(false);
+  const [trailerShowing, setTrailerShowing] = useState(false);
 
   const navigateToDetail = () => {
     if (fromDetail) return;
@@ -102,9 +122,11 @@ function Content({
       onClick={navigateToDetail}
       onMouseEnter={() => {
         setTitleShowing(true);
+        setTrailerShowing(true);
       }}
       onMouseLeave={() => {
         setTitleShowing(false);
+        setTrailerShowing(false);
       }}
       variants={contentVariants}
       initial={false}
@@ -123,7 +145,18 @@ function Content({
                 data.backdrop_path || data.poster_path,
                 "w500"
               )}
-            />
+            >
+              <TrailerWrapper>
+                {trailerShowing && (
+                  <Trailer
+                    mediaId={id}
+                    mediaType={mediaType}
+                    key={mediaType + id}
+                    fromBanner={false}
+                  />
+                )}
+              </TrailerWrapper>
+            </Cover>
           ) : (
             <NoCover
               layoutId={`${category + id}noCover`}

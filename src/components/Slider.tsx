@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { wrap } from "popmotion";
 import { useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { IMedia } from "../api";
+import { IMedia, MediaTypes } from "../api";
 import useViewportSize from "../hooks/useViewportSize";
 import Content from "./Content";
 
@@ -27,6 +27,7 @@ const Title = styled.h1`
 const Row = styled.div<{ $sliderOffset: number }>`
   position: relative;
   width: 100%;
+  z-index: 2;
 
   height: ${(props) =>
     props.$sliderOffset === 6
@@ -129,9 +130,10 @@ interface ISliderProps {
   data: IMedia[];
   title: string;
   categoryId: string;
+  mediaType: MediaTypes;
 }
 
-function Slider({ data, title, categoryId }: ISliderProps) {
+function Slider({ data, title, categoryId, mediaType }: ISliderProps) {
   const [arrowShowing, setArrowShowing] = useState(false);
 
   const { viewportWidth } = useViewportSize();
@@ -204,6 +206,7 @@ function Slider({ data, title, categoryId }: ISliderProps) {
                   id={data[dataIndex + index].id + ""}
                   isFirstChild={index === 0}
                   isLastChild={index === sliderOffset - 1}
+                  mediaType={mediaType}
                 />
               </ContentWrapper>
             </AnimatePresence>

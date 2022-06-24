@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { ISearchMediaResult, MediaType, searchContents } from "../api";
+import { ISearchMediaResult, MediaTypes, searchContents } from "../api";
 import Content from "../components/Content";
 import useViewportSize from "../hooks/useViewportSize";
 
@@ -72,7 +72,7 @@ function Search() {
       <Text>Search results for "{keyword}"</Text>
       <Results $sliderOffset={sliderOffset}>
         {data?.results
-          .filter((result) => result.media_type !== MediaType.PERSON)
+          .filter((result) => result.media_type !== MediaTypes.PERSON)
           .map((result, index) => (
             <ContentWrapper
               $sliderOffset={sliderOffset}
@@ -90,6 +90,7 @@ function Search() {
                 id={result.id + ""}
                 isFirstChild={index % sliderOffset === 0}
                 isLastChild={(index + 1) % sliderOffset === 0}
+                mediaType={result.media_type}
               />
             </ContentWrapper>
           ))}
