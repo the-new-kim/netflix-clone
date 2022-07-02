@@ -36,6 +36,7 @@ const Wrapper = styled.div`
     color: white;
     border: none;
     padding: 10px 30px;
+    cursor: pointer;
   }
 `;
 

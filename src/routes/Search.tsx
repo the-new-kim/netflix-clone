@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useLayoutEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
@@ -69,6 +70,9 @@ function Search() {
 
   return (
     <Wrapper>
+      <Helmet>
+        <title>Netflix Clone | Search</title>
+      </Helmet>
       <Text>Search results for "{keyword}"</Text>
       <Results $sliderOffset={sliderOffset}>
         {data?.results

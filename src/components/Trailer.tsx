@@ -151,7 +151,7 @@ function Trailer({
               if (typeof setOverviewShowing === "undefined") return;
               setTimeout(() => {
                 setOverviewShowing(false);
-              }, 5000);
+              }, 2000);
             }}
             onEnded={() => {
               console.log("end from Trailer component");

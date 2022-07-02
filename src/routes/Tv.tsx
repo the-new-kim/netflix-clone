@@ -1,4 +1,5 @@
 import { AnimatePresence } from "framer-motion";
+import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { useMatch } from "react-router-dom";
 import {
@@ -69,6 +70,10 @@ function Tv() {
 
   return (
     <>
+      {" "}
+      <Helmet>
+        <title>Netflix Clone | Tv Shows</title>
+      </Helmet>
       {!dataOnTheAir ||
       !dataTopRated ||
       !dataPopular ||

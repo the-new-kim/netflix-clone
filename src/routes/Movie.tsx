@@ -1,4 +1,5 @@
 import { AnimatePresence } from "framer-motion";
+import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { useMatch } from "react-router-dom";
 import {
@@ -70,6 +71,9 @@ function Movie() {
 
   return (
     <>
+      <Helmet>
+        <title>Netflix Clone | Movies</title>
+      </Helmet>
       {!dataNowPlaying ||
       !dataTopRated ||
       !dataUpcoming ||

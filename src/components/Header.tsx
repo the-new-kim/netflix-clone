@@ -158,7 +158,7 @@ function Header() {
         </Logo>
         <Nav>
           <Link to="/movie">
-            Movie {movieMatch ? <ActiveLink layoutId="active" /> : null}
+            Movies {movieMatch ? <ActiveLink layoutId="active" /> : null}
           </Link>
           <Link to="/tv">
             Tv Shows{tvMatch ? <ActiveLink layoutId="active" /> : null}
