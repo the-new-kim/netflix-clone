@@ -93,6 +93,7 @@ interface IContentProps {
   isFirstChild: boolean;
   isLastChild: boolean;
   fromDetail?: boolean;
+  fromSearch?: boolean;
   mediaType: MediaTypes;
 }
 
@@ -103,6 +104,7 @@ function Content({
   isFirstChild,
   isLastChild,
   fromDetail = false,
+  fromSearch = false,
   mediaType,
 }: IContentProps) {
   const navigate = useNavigate();
@@ -110,7 +112,7 @@ function Content({
   const [trailerShowing, setTrailerShowing] = useState(false);
 
   const navigateToDetail = () => {
-    if (fromDetail) return;
+    if (fromDetail || fromSearch) return;
     setTitleShowing(false);
     navigate(`${category}/${id}`);
   };

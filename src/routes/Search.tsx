@@ -95,6 +95,7 @@ function Search() {
                 isFirstChild={index % sliderOffset === 0}
                 isLastChild={(index + 1) % sliderOffset === 0}
                 mediaType={result.media_type}
+                fromSearch
               />
             </ContentWrapper>
           ))}
