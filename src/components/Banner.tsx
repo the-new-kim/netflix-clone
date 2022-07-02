@@ -73,10 +73,6 @@ function Banner({ bannerData, mediaType }: IBannerProps) {
   const [randomIndex, setRandomIndex] = useState(0);
   const [overviewShowing, setOverviewShowing] = useState(true);
 
-  // useEffect(() => {
-  //   console.log("trailer:", trailer, "overview:", overviewShowing);
-  // }, [trailer, overviewShowing]);
-
   useLayoutEffect(() => {
     if (!bannerData.results.length) return;
     setRandomIndex(Math.floor(Math.random() * bannerData.results.length));
