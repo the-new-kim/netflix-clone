@@ -130,6 +130,13 @@ const MobileMenu = styled.div`
     margin-top: 20px;
     text-align: center;
   }
+
+  display: none;
+  @media (max-width: 780px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 const wrapperVariants = {
