@@ -27,6 +27,7 @@ const LogoAndNav = styled.div`
 
 const Logo = styled.div`
   margin-right: 50px;
+  z-index: 100;
 `;
 
 const LogoSvg = styled(motion.svg)`
@@ -42,6 +43,9 @@ const Nav = styled.nav`
     position: relative;
     margin-right: 20px;
   }
+  @media (max-width: 780px) {
+    display: none;
+  }
 `;
 
 const ActiveLink = styled(motion.div)`
@@ -54,7 +58,11 @@ const ActiveLink = styled(motion.div)`
   background-color: rgba(255, 255, 255, 0.3);
 `;
 
-const Search = styled.div``;
+const Search = styled.div`
+  @media (max-width: 780px) {
+    display: none;
+  }
+`;
 
 const SearchForm = styled.form`
   position: relative;
@@ -86,6 +94,44 @@ const SearchInput = styled(motion.input)`
   }
 `;
 
+const MobileMenuIcon = styled.div`
+  z-index: 100;
+  cursor: pointer;
+  display: none;
+  @media (max-width: 780px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+const MobileMenu = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+
+  * {
+    font-size: xx-large;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  input {
+    padding: 5px 0;
+    max-width: 80%;
+    margin-top: 20px;
+    text-align: center;
+  }
+`;
+
 const wrapperVariants = {
   top: {
     background: "linear-gradient(0deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6))",
@@ -98,6 +144,10 @@ interface IForm {
 }
 
 function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const toggleMobileMenuOpen = () => {
+    setMobileMenuOpen((prev) => !prev);
+  };
   //Nav
   const navigate = useNavigate();
   const movieMatch = useMatch("/movie");
@@ -109,6 +159,7 @@ function Header() {
   const onValid = ({ keyword }: IForm) => {
     navigate(`/search?keyword=${keyword}`);
     setValue("keyword", "");
+    mobileMenuOpen && setMobileMenuOpen(false);
   };
   const toggleSearch = () => {
     setSearchOpen((prev) => !prev);
@@ -141,9 +192,6 @@ function Header() {
         <Logo>
           <Link to="/">
             <LogoSvg
-              //   variants={logoVariants}
-              //   initial="normal"
-              //   whileHover="hover"
               xmlns="http://www.w3.org/2000/svg"
               width="1024"
               height="276.742"
@@ -156,6 +204,7 @@ function Header() {
             </LogoSvg>
           </Link>
         </Logo>
+
         <Nav>
           <Link to="/movie">
             Movies {movieMatch ? <ActiveLink layoutId="active" /> : null}
@@ -192,6 +241,46 @@ function Header() {
           </motion.svg>
         </SearchForm>
       </Search>
+
+      <MobileMenuIcon onClick={toggleMobileMenuOpen}>
+        <svg
+          width="28px"
+          height="28px"
+          viewBox="0 0 28 28"
+          fill="white"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M3 7C3 6.44771 3.44772 6 4 6H24C24.5523 6 25 6.44771 25 7C25 7.55229 24.5523 8 24 8H4C3.44772 8 3 7.55229 3 7Z"
+            fill="white"
+          />
+          <path
+            d="M3 14C3 13.4477 3.44772 13 4 13H24C24.5523 13 25 13.4477 25 14C25 14.5523 24.5523 15 24 15H4C3.44772 15 3 14.5523 3 14Z"
+            fill="white"
+          />
+          <path
+            d="M4 20C3.44772 20 3 20.4477 3 21C3 21.5523 3.44772 22 4 22H24C24.5523 22 25 21.5523 25 21C25 20.4477 24.5523 20 24 20H4Z"
+            fill="white"
+          />
+        </svg>
+      </MobileMenuIcon>
+      {mobileMenuOpen && (
+        <MobileMenu>
+          <Link to="/movie" onClick={toggleMobileMenuOpen}>
+            Movies
+          </Link>
+          <Link to="/tv" onClick={toggleMobileMenuOpen}>
+            Tv Shows
+          </Link>
+          <form onSubmit={handleSubmit(onValid)} ref={formRef}>
+            <SearchInput
+              {...register("keyword", { required: true })}
+              type="text"
+              placeholder="Search"
+            />
+          </form>
+        </MobileMenu>
+      )}
     </Wrapper>
   );
 }

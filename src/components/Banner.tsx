@@ -2,6 +2,7 @@ import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useLayoutEffect, useState } from "react";
 import styled from "styled-components";
 import { IGetMediaResult, MediaTypes } from "../api";
+import useViewportSize from "../hooks/useViewportSize";
 import { makeImagePath } from "../utils";
 import Trailer from "./Trailer";
 
@@ -51,17 +52,23 @@ const Texts = styled(motion.div)`
 `;
 
 const Title = styled(motion.h1)`
-  font-size: 7vw;
+  font-size: 5rem;
 
   font-weight: 700;
   width: 70%;
   text-shadow: ${(props) => props.theme.titleShadow};
+  @media (max-width: 780px) {
+    font-size: 2rem;
+  }
 `;
 const Overview = styled(motion.p)`
   padding-top: 30px;
   width: 60%;
-  font-size: 1.5vw;
+  font-size: 1.2rem;
   text-shadow: 0px 0px 30px rgba(0, 0, 0, 0.6);
+  @media (max-width: 780px) {
+    display: none;
+  }
 `;
 
 interface IBannerProps {
@@ -70,6 +77,7 @@ interface IBannerProps {
 }
 
 function Banner({ bannerData, mediaType }: IBannerProps) {
+  const { viewportWidth } = useViewportSize();
   const [randomIndex, setRandomIndex] = useState(0);
   const [overviewShowing, setOverviewShowing] = useState(true);
 
@@ -87,14 +95,15 @@ function Banner({ bannerData, mediaType }: IBannerProps) {
         )}
       />
 
-      <Trailer
-        mediaId={bannerData.results[randomIndex].id}
-        mediaType={mediaType}
-        key={mediaType + bannerData.results[randomIndex].id}
-        fromBanner
-        setOverviewShowing={setOverviewShowing}
-      />
-
+      {viewportWidth > 780 && (
+        <Trailer
+          mediaId={bannerData.results[randomIndex].id}
+          mediaType={mediaType}
+          key={mediaType + bannerData.results[randomIndex].id}
+          fromBanner
+          setOverviewShowing={setOverviewShowing}
+        />
+      )}
       <GradientBg />
       <LayoutGroup>
         <Texts layout>

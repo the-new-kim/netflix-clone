@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IMedia, MediaTypes } from "../api";
+import useViewportSize from "../hooks/useViewportSize";
 import { makeImagePath } from "../utils";
 import Trailer from "./Trailer";
 
@@ -110,6 +111,7 @@ function Content({
   const navigate = useNavigate();
   const [titleShowing, setTitleShowing] = useState(false);
   const [trailerShowing, setTrailerShowing] = useState(false);
+  const { viewportWidth } = useViewportSize();
 
   const navigateToDetail = () => {
     if (fromDetail || fromSearch) return;
@@ -148,16 +150,18 @@ function Content({
                 "w500"
               )}
             >
-              <TrailerWrapper>
-                {trailerShowing && (
-                  <Trailer
-                    mediaId={id}
-                    mediaType={mediaType}
-                    key={mediaType + id}
-                    fromBanner={false}
-                  />
-                )}
-              </TrailerWrapper>
+              {viewportWidth > 780 && (
+                <TrailerWrapper>
+                  {trailerShowing && (
+                    <Trailer
+                      mediaId={id}
+                      mediaType={mediaType}
+                      key={mediaType + id}
+                      fromBanner={false}
+                    />
+                  )}
+                </TrailerWrapper>
+              )}
             </Cover>
           ) : (
             <NoCover

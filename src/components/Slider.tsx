@@ -16,14 +16,12 @@ const Title = styled.h1`
   font-size: 30px;
   font-weight: bold;
   padding: 10px;
-`;
-// const Main = styled.div<{ $sliderOffset: number }>`
-//   position: relative;
 
-//   display: flex;
-//   justify-content: flex-start;
-//   align-items: center;
-// `;
+  @media (max-width: 780px) {
+    font-size: 20px;
+  }
+`;
+
 const Row = styled.div<{ $sliderOffset: number }>`
   position: relative;
   width: 100%;

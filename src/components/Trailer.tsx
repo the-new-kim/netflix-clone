@@ -147,14 +147,12 @@ function Trailer({
             muted={muted}
             onReady={() => {}}
             onStart={() => {
-              console.log("start");
               if (typeof setOverviewShowing === "undefined") return;
               setTimeout(() => {
                 setOverviewShowing(false);
               }, 2000);
             }}
             onEnded={() => {
-              console.log("end from Trailer component");
               setTrailer(null);
               if (typeof setOverviewShowing === "undefined") return;
               setOverviewShowing(true);

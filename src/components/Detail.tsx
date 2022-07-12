@@ -10,6 +10,7 @@ import {
   IGetMediaResult,
   MediaTypes,
 } from "../api";
+import useViewportSize from "../hooks/useViewportSize";
 import { makeImagePath, toHoursAndMinutes } from "../utils";
 import Content from "./Content";
 import Trailer from "./Trailer";
@@ -187,6 +188,7 @@ interface IDetailProps {
 }
 
 function Detail({ dataDetail, matched, mediaType }: IDetailProps) {
+  const { viewportWidth } = useViewportSize();
   const [clickable, setClickable] = useState(true);
   const navigate = useNavigate();
 
@@ -229,15 +231,17 @@ function Detail({ dataDetail, matched, mediaType }: IDetailProps) {
                 }cover`}
                 $bgImg={makeImagePath(dataDetail.backdrop_path)}
               >
-                <TrailerWrapper>
-                  <Trailer
-                    mediaId={dataDetail.id}
-                    mediaType={mediaType}
-                    key={mediaType + dataDetail.id}
-                    fromBanner={false}
-                    fromDetail={true}
-                  />
-                </TrailerWrapper>
+                {viewportWidth > 780 && (
+                  <TrailerWrapper>
+                    <Trailer
+                      mediaId={dataDetail.id}
+                      mediaType={mediaType}
+                      key={mediaType + dataDetail.id}
+                      fromBanner={false}
+                      fromDetail={true}
+                    />
+                  </TrailerWrapper>
+                )}
                 <CloseBtn onClick={goBack}>&#10005;</CloseBtn>
                 <Title>{dataDetail.title || dataDetail.name}</Title>
                 <GradientBg />
