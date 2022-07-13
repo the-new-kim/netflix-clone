@@ -1,7 +1,7 @@
 # Netflix Clone
 
 react netflix clone using the movie database api
-mader after react master class course of [Nomad Coders](https://nomadcoders.co/).
+made after react master class course of [Nomad Coders](https://nomadcoders.co/).
 
 ## Used Libraries
 
