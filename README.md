@@ -1,6 +1,7 @@
 # Netflix Clone
 
 react netflix clone using the movie database api
+mader after react master class course of [Nomad Coders](https://nomadcoders.co/).
 
 ## Used Libraries
 
@@ -12,5 +13,7 @@ react netflix clone using the movie database api
 - `recoil`
 - `styled-components`
 - `framer-motion`
+
+## Page Link
 
 [Link](https://the-new-kim.github.io/netflix-clone/)
