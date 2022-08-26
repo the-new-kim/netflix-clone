@@ -15,6 +15,6 @@ react app built on [The Movie Database API](https://www.themoviedb.org/)
 - `styled-components`
 - `framer-motion`
 
-## Reference
+## References
 
 [Nomad Coders](https://nomadcoders.co/)
