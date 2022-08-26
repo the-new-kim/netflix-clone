@@ -1,7 +1,8 @@
 # Netflix Clone
 
-a react netflix clone using [The Movie Database](https://www.themoviedb.org/) api
-made after watching the react master class course of [Nomad Coders](https://nomadcoders.co/).
+react app built on [The Movie Database API](https://www.themoviedb.org/)
+
+## [View Live](https://the-new-kim.github.io/netflix-clone/) 👈
 
 ## Used Libraries
 
@@ -14,6 +15,6 @@ made after watching the react master class course of [Nomad Coders](https://noma
 - `styled-components`
 - `framer-motion`
 
-## Page Link
+## Course
 
-[Link](https://the-new-kim.github.io/netflix-clone/)
+[Nomad Coders](https://nomadcoders.co/)
