@@ -1,5 +1,7 @@
 # Netflix Clone
 
+![alt text](https://res.cloudinary.com/dx06ztif0/image/upload/v1679066140/Screen_Recording_2023-03-18_at_0.11.27_n069ru.gif)
+
 react app built on The movie database API
 
 `react-helmet`
